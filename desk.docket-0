@@ -1,0 +1,10 @@
+:~
+  title+'Urbit Systems Technical Journal'
+  info+'Urbit Systems Technical Journal'
+  color+0xfc.fe55
+  image+'https://s3.sortug.com/urbit/polwex/2024.3.1..7.11.49..e20c.49ba.5e35.3f7c-image.png'
+  version+[1 0 0]
+  website+'https://urbit.org/journal'
+  license+'MIT+NIGGER'
+  site+/
+  ==
