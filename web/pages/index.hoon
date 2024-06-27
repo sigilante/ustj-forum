@@ -1,6 +1,7 @@
 /-  sur=forum, tp=post
-/+  lib=forum, sr=sortug 
-|_  [thp=thread-page:sur =bowl:gall]
+/+  lib=forum, sr=sortug, cons=constants 
+/=  comps  /web/components/components
+|_  [thp=thread-page:sur =state:sur =bowl:gall]
 ++  $  ^-  manx
 ;main
   ;div#index-top.f.g1
@@ -14,7 +15,10 @@
 ==
 ++  thread-list  ^-  marl
   =/  tl  threads.thp
-  =/  i  1
+  =/  page  -.thp
+  ~&  page=page
+  =/  init  (mul (dec -.thp) page-size:cons)
+  =/  i  +(init)
   =|  res=marl
   |-  ?~  tl  (flop res)
     =/  ted  (thread i i.tl)
@@ -25,37 +29,19 @@
   =/  thread-link  (scow:sr %uw (jam pid.t))
   =/  titlet  (trip title.t)
   =/  numt  (scow %ud num)
+  =/  descendants  (total-comments:lib t state)
   =/  link  ?.  ?=(%link -.content.t)  ~
             ;+  (link-div +.content.t)
-  =/  ago  (post-date-ago:lib id.pid.t now.bowl %yau)
-  =/  author  (scow %p ship.pid.t)
-  =/  comments  ?~  replies.t  ~  
-    ;+  ;div:"{(scow %ud (lent replies.t))} comments"
 
-  
   ;div.thread-preview.f.g2
     ;div.num:"{numt}."
     ;div.preview
       ;div.title.f.g1
-        ;a/"/forum/ted/{thread-link}":"{titlet}"
+        ;a.title-text/"/forum/ted/{thread-link}":"{titlet}"
         ;*  link  
       ==
-      ;div.meta.f.g2
-        ;+  (votes votes.t)
-        ;div:"{author}"
-        ;div:"{ago} ago"
-        ;*  comments
-      ==
+      ;+  (thread-metadata:comps pid.t now.bowl votes.t descendants)
     ==
-  ==
-++  votes  |=  v=votes:tp
-  =/  old  (old:si tally.v)
-  =/  img  ?:  -.old
-    ;img@"/up.svg";
-    ;img@"/down.svg";
-  ;div.f.g0
-    ;+  img
-    ;div:"{(scow %ud +.old)}"
   ==
 ++  link-div  |=  l=@t
 =/  url  (de-purl:html l)
@@ -72,11 +58,13 @@
   ?:  .=(~ dom)  "{el}"  "{dom}.{el}"
   $(parts t.parts)
   
-;div.out-link
-  ;a/"{(trip l)}":"({domain})"
-  ;img@"/imgs/outlink.svg";
+;a.out-link/"{(trip l)}"(target "_blank")
+  ;span:"({domain})"
+  ;span.arrow:"↗"
 ==
 ++  moar
+  =/  len  (lent threads.thp)
+  ?:  (lth len page-size:cons)  ;span;
   =/  page-num  (add 1 page.thp) 
-  ;a/"/forum/p/{(scow %ud page-num)}":"More"
+  ;a.moar/"/forum/p/{(scow %ud page-num)}":"More"
 --

@@ -1,6 +1,130 @@
-/-  tp=post
-/+  sr=sortug
+/-  tp=post, md=markdown
+/+  sr=sortug, mdlib=markdown
 |%
+:: new! using wispem's lib
+++  tokenise
+|=  t=@t  ^-  (each content-list:tp @t)
+  =/  parsed  (rush t markdown:de:md:mdlib)
+  ?~  parsed  [%| 'parsing error']
+  :-  %&
+  %+  turn  u.parsed  de-node  
+++  de-node  |=  =node:markdown:md  ^-  block:tp
+  ?~  node  [%paragraph ~]
+  ?-  -.node
+    %leaf       (de-leaf +.node)
+    %container  (de-cont +.node)
+  ==
+
+++  de-leaf  |=  =node:leaf:markdown:md  ^-  block:tp
+  ?~  node  [%paragraph ~]
+  ?-  -.node
+    %heading              (de-heading node)
+    %break                [%paragraph :~([%break ~])]
+    %indent-codeblock     [%codeblock text.node '']
+    %fenced-codeblock     [%codeblock text.node info-string.node]
+    %html                 [%codeblock text.node 'html']
+    %link-ref-definition  [%paragraph :~([%link '' label.node])]
+    %paragraph            [%paragraph (de-inline contents.node)]
+    %blank-line           [%paragraph :~([%break ~])]
+    %table                [%paragraph :~([%break ~])]  :: TODO
+  ==
+++  de-heading  |=  h=heading:leaf:markdown:md
+  :+  %heading  (flatten-inline contents.h)
+  ?:  .=(1 level.h)  %h1
+  ?:  .=(2 level.h)  %h2
+  ?:  .=(3 level.h)  %h3
+  ?:  .=(4 level.h)  %h4
+  ?:  .=(5 level.h)  %h5  %h6
+++  de-inline  |=  inls=contents:inline:md
+  =|  res=(list inline:tp)
+  |-  ?~  inls  (flop res)
+    =/  inl  i.inls
+    =/  r=inline:tp  ?-  -.inl
+      %escape           [%codespan char.inl]
+      %entity           [%codespan code.inl]
+      %code-span        [%codespan text.inl]
+      %line-break       [%break ~]
+      %soft-line-break  [%break ~]
+      %text             [%text text.inl]
+      %emphasis         (de-strong +.inl)
+      %strong           (de-strong +.inl)
+      %link             [%link (de-target target.inl) (flatten-inline contents.inl)]
+      %image            [%img (de-target target.inl) alt-text.inl]
+      %autolink         [%text '']
+      %html             [%codespan text.inl]
+    ==
+    $(inls t.inls, res [r res])
+++  de-strong  |=  [char=@t inls=contents:inline:md]
+?:  .=('_' char)  [%italic (flatten-inline inls)]
+                  [%bold (flatten-inline inls)]
+++  de-target  |=  tar=target:ln:md
+:: TODO lotsa stuff here
+  ?-  -.tar
+    %direct  text.url.urlt.tar
+    %ref     label.tar
+  ==
+++  flatten-inline  |=  inls=contents:inline:md  ^-  @t
+  =/  res  ""
+  |-  ?~  inls  (crip res)
+    =/  inl  i.inls
+    =/  r  ?+  -.inl  ""
+      %escape           (trip char.inl)
+      %entity           (trip code.inl)
+      %code-span        (trip text.inl)
+      %text             (trip text.inl)
+      %emphasis         (trip (flatten-inline contents.inl))
+      %strong           (trip (flatten-inline contents.inl))
+      %link             (trip (flatten-inline contents.inl))
+      %image            (trip (de-target target.inl))
+      %html             (trip text.inl)
+    ==
+    $(inls t.inls, res "{res} {r}")
+++  de-cont  |=  =node:container:markdown:md  ^-  block:tp
+  ?~  node  [%paragraph ~]
+  ?-  -.node
+    %block-quote  [%blockquote (denest +.node)]
+    %ol           [%list (de-list contents.node) .y]
+    %ul           [%list (de-list contents.node) .n]
+    %tl           [%tasklist (turn contents.node de-task)]
+  ==
+++  de-task  |=  [checked=? mde=markdown:md]  ^-  task:tp
+  :_  checked  (denest mde)
+++  de-list  |=  lmd=(list markdown:md)  ^-  (list li:tp)
+  =|  res=(list li:tp)
+  |-  ?~  lmd  (flop res)
+    =/  nodelist  i.lmd
+    =/  blocks  %+  turn  nodelist  de-node
+    $(lmd t.lmd, res [blocks res])
+++  denest  |=  mde=markdown:md  ^-  paragraph:tp
+  =|  res=paragraph:tp
+  |-  ?~  mde  (flop res)
+    =/  block  (de-node i.mde)
+    =/  r=paragraph:tp  (break-block block)
+    =/  nr  (weld res r)
+    $(mde t.mde, res nr)
+
+++  break-block  |=  =block:tp  ^-  paragraph:tp
+?+  -.block  ~
+  %paragraph   p.block
+  %blockquote  p.block
+  %heading     :~([%text p.block])
+  %codeblock   :~([%text code.block])
+  %eval        :~([%text hoon.block])
+  %list        (break-list p.block)
+==
+++  break-list  |=  lis=(list li:tp)  ^-  paragraph:tp
+  =|  res=paragraph:tp
+  |-  ?~  lis  (flop res)
+    =/  par  (ibreak-list i.lis)
+    =/  nr  (weld res par)
+    $(lis t.lis, res nr)
+++  ibreak-list  |=  blocks=(list block:tp)  ^-  paragraph:tp
+  =|  res=paragraph:tp
+  |-  ?~  blocks  (flop res)
+    =/  par  (break-block i.blocks)
+    =/  nr  (weld res par)
+    $(blocks t.blocks, res nr)
+
 ::  tape -> post:trill, parsing user input from Sail
 +$  heading  $?(%h1 %h2 %h3 %h4 %h5 %h6)
 
@@ -191,16 +315,8 @@
   %ship     (scow %p p.i)
   %codespan   "`{(trip p.i)}`"  
   %link   "[{(trip show.i)}]({(trip href.i)})"
+  %img    "![{(trip alt.i)}]({(trip src.i)})"
   %break  "\0a"
-  :: TODO custom syntax
-  %date  
-  =/  t  (time:enjs:format p.i)
-  ?.  ?=(%n -.t)  ""  (trip p.t)
-  %note  ""  :: TODO
-  %underline   (trip p.i)
-  %sup   (trip p.i)
-  %sub   (trip p.i)
-  %ruby   (trip p.i) 
   ==
 ++  tags-to-tape
 |=  t=(set @t)  ^-  tape

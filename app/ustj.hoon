@@ -1,5 +1,5 @@
 /-  *forum
-/+  dbug, lib=forum, const=constants
+/+  dbug, sr=sortug, lib=forum, const=constants, seeds, cacher
 /=  router     /web/router
 |%
 ++  card  card:agent:gall
@@ -17,6 +17,8 @@
 |_  =bowl:gall
  +*  this      .
      hd   ~(. +> [state bowl])
+     rout   ~(. router:router [state bowl])
+     cache  ~(. cacher [state bowl])
 ++  on-fail   |~(* `this)
 ++  on-leave  |~(* `this)
 ++  on-save   !>(state)
@@ -40,53 +42,131 @@
 ==
   ++  on-poke-noun
   |=  a=*
+  ?:  ?=([%ui *] a)  (handle-ui a)
+  ?:  ?=([%cache *] a)   (handle-cache +.a)
+  ?:  ?=(%test a)  test
   ?:  ?=(%print a)  print
-  ?:  ?=(%seed a)  seed
+  ?:  ?=(%seed a)   teds:seed
+  ?:  ?=(%seed2 a)  coms:seed
+  ?:  ?=(%seed3 a)  reps:seed
+  ~&  wtf=a
+  `this
+  ++  handle-cache  |=  a=*  :_  this  
+    =/  which  ($?(%root %ted %sta %all) a)
+    ?-  which
+      %root  :~(cache-root:cache)
+      %sta   cache-static:cache
+      %ted   cache-threads:cache
+      %all   cache-all:cache
+    ==
+  ++  handle-ui  |=  noun=*
+    =^  cards  state  (handle-ui:cache noun)
+    [cards this]
+  ++  test
+    =/  teds  (tap:torm threads)
+    ~&  teds=(lent teds)
+    =/  coms  (tap:gorm:tp comments)
+    ~&  coms=(lent coms)
   `this
   ++  print
   ~&  >  state=state
   `this
   ++  seed
-    =/  authors=(list @p)  :~
-      ~zod
-      ~polwex
-      ~lagrev-nocfep
-      ~lagrev-nocfep
-    ==
-    =/  titles=(list @t)
-      :~ 
-     'Helldivers 2 has caused over 20k Steam accounts to be banned'
-     'UI elements with a hand-drawn, sketchy look'
-     '60 kHz (2022)'
-     'Show HN: Every mountain, building and tree shadow mapped for any date and time'
-     'Snowflake breach: Hacker confirms access through infostealer infection'
-     'Heroku Postgres is now based on AWS Aurora'
-     'Armor from Mycenaean Greece turns out to have been effective'
-     'Why is no Laravel/Rails in JavaScript? Will there be one?'
-     'Moving Beyond Type Systems'
-     'Japanese \'My Number Card\' Digital IDs Coming to Apple\'s Wallet App'
-     'How to copy a file from a 30-year-old laptop'
-     '(some) good corporate engineering blogs are written'
-     'Debian KDE: Right Linux distribution for professional digital painting in 2024'
-     'Go: Sentinel errors and errors.Is() slow your code down by 3000%'
-     '"Moveable Type" to end 17-year run in The New York Times\'s lobby'
-     'London\'s Evening Standard axes daily print edition'
-      ==
     =/  rng  ~(. og eny.bowl)
-    |-  ?~  titles  `this
-      =^  r1  rng  (rads:rng 1)
-      ~&  >>  rng=rng
-      =/  r  (rad:rng 3)
-      =/  =content  ?:  .=(0 r1)
-      [%link 'https://urbit.org']  [%text ~]
-      =/  author  (snag r authors)
-      =/  date  (sub now.bowl (mul ~h1 (rad:rng 500)))
-      =/  ted  (build-thread:lib i.titles author date content)
-      =/  tally  (new:si [(? r1) (rad:rng 1.000)])
-      =.  ted  ted(votes [tally ~])
-      =.  threads  (put:torm threads [author date] ted)
-      
+    |%
+    ++  teds
+    =/  titles  titles:seeds
+    =.  state
+    |-  ?~  titles  state
+      =^  r1  rng  (rads:rng 100)
+      =/  coinflip=?  (lte 50 r1)
+      =/  =content  ?:  coinflip
+        =/  ind  (rad:rng (lent links:seeds))  
+        =/  url  (snag ind links:seeds)
+          [%link url]  
+        =/  ind  (rad:rng (lent md:seeds))  
+        =/  md  (snag ind md:seeds)
+        =/  cl  (build-content:lib md)
+           [%text cl]
+       =/  author  
+         =/  ind  (rad:rng (lent authors:seeds))  
+         (snag ind authors.seeds)
+       =/  date  (sub now.bowl (mul ~h1 (rad:rng 500)))
+       =/  ted  (build-thread:lib i.titles author date content)
+       =/  tally  (new:si [coinflip (rad:rng 1.000)])
+       =.  ted  ted(votes [tally ~])
+       =.  threads  (put:torm threads [author date] ted)
       $(titles t.titles)
+    :_  this  cache-all:cache
+    ++  reps
+      =/  coml  (tap:gorm:tp comments)
+      =^  r  rng  (rads:rng 100)
+      =.  state
+      |-  ?~  coml  state
+        =/  com=comment:tp  +.i.coml
+        =/  ppid  [author.com id.com]
+        =^  r0  rng  (rads:rng 300)
+        =/  subcoms  (make-seed-comments thread.com ppid)
+        =.  state  (save-replies subcoms com)
+        $(coml t.coml)
+      :_  this  cache-all:cache
+    ++  coms
+      =/  tedl  (tap:torm threads)
+      =^  r  rng  (rads:rng 100)
+      =.  state
+      |-  ?~  tedl  state
+        =/  ted=thread  +.i.tedl
+        =^  r0  rng  (rads:rng 30)
+        ::  important!! renew the rng before every function call
+        =/  coms  (make-seed-comments pid.ted pid.ted)
+        =.  state  (save-comments coms ted)
+        $(tedl t.tedl)
+      :_  this  cache-all:cache
+      
+  ++  save-replies  |=  [cl=(list comment:tp) par=comment:tp]  ^+  state
+    |-  ?~  cl  state
+    =/  c  i.cl
+    =/  cpid=pid:tp  [author.c id.c]
+    =.  comments  (put:gorm:tp comments cpid c)
+    =/  nc  (~(put in children.par) cpid)
+    =.  par  par(children nc)
+    =/  ppid  [author.par id.par]
+    =.  comments  (put:gorm:tp comments ppid par)
+    $(cl t.cl)
+
+  ++  save-comments  |=  [cl=(list comment:tp) ted=thread]  ^+  state
+    |-  ?~  cl  state
+    =/  c  i.cl
+    =/  cpid=pid:tp  [author.c id.c]
+    =.  comments  (put:gorm:tp comments cpid c)
+    =/  nr  [cpid replies.ted]
+    =/  nted  ted(replies nr)
+    =.  threads  (put:torm threads pid.ted nted)
+    $(cl t.cl, ted nted)
+    
+  ++  make-seed-comments  |=  [tpid=pid:tp ppid=pid:tp]
+    =|  coms=(list comment:tp)
+    =^  r0  rng  (rads:rng 30)
+    :: ~&  >>  r0=r0
+    =/  l  (gulf 0 r0)
+    |-  ?~  l  coms
+      =^  r1  rng  (rads:rng 100)
+      :: ~&  r1=r1
+      =/  coinflip=?  (lte 50 r1)
+      =/  content  
+        =/  ind  (rad:rng (lent md:seeds))  
+        =/  md  (snag ind md:seeds)
+        (build-content:lib md)
+      =/  author  
+        =/  ind  (rad:rng (lent authors:seeds))  
+        (snag ind authors.seeds)
+      =/  date  (sub now.bowl (mul ~h1 (rad:rng 500)))
+      =.  bowl  bowl(src author, now date)
+      =/  com  (build-comment:lib content bowl tpid ppid)
+      =/  tally  (new:si [coinflip (rad:rng 1.000)])
+      =.  com  com(votes [tally ~])
+      $(l t.l, coms [com coms])
+    --
   ::
   ++  serve
   ^-  (quip card _this)
@@ -95,8 +175,7 @@
   =/  address  address.req.order
   :: ?:  (~(has in banned.admin) address)  `this  
   :: ~&  >>>  malicious-request-alert=req.order  `this
-  :_  this
-  %-  route:router  [order state bowl]
+  :_  this  (eyre:rout order)
 --
 ++  on-peek   
 |=  =(pole knot)  ~
@@ -107,9 +186,10 @@
 --
 ::  helper
 |_  [s=versioned-state =bowl:gall]
-++  cache-card  |=  [pathc=@t pl=simple-payload:http]  ^-  card
-  =/  entry=cache-entry:eyre  [.n %payload pl]
-  [%pass /root %arvo %e %set-response pathc `entry]
+:: ++  static-caches  ^-  (list card)
+:: :~  (cache-card '/forum/new-thread' (render:rout '/new-thread'))
+::     :: (cache-card '/forum/new-thread')
+:: ==
 ++  root-path-card  ^-  card
   [%pass /root %arvo %e %connect [~ /forum] dap.bowl]
 ++  init-cards  ^-  (list card)

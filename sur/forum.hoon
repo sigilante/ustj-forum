@@ -1,5 +1,12 @@
 /-  tp=post
 |%
++$  pokes  [%ui eyre-id=@ta p=ui-pokes]
++$  ui-pokes
+  $%  [%submit-comment ted=thread text=@t]
+      [%submit-reply =comment:tp text=@t]
+      [%submit-thread title=@t url=@t text=@t]
+      [%vote ted=? =pid:tp vote=?]
+  ==
 +$  state
 $%  state-0
 ==
@@ -8,7 +15,7 @@ $:  %0
     =threads
     popular=pfeed
     comments=gfeed:tp
-    karma=(map @p @ud)
+    karma=(map @p @sd)
     ::
     mods=(set @p)
     admins=(set @p)

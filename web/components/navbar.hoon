@@ -1,28 +1,47 @@
 /+  sig=sigil-sigil
 |_  =bowl:gall
-++  login
+++  login  ^-  manx
   ?-  (clan:title src.bowl)
   %czar  sigil
   %king  sigil
   %duke  sigil
   %earl  sigil
-  %pawn  ;a/"/~/login":"Log In"
+  %pawn  login-prompt
+  ==
+++  login-prompt  ^-  manx
+  ;a/"/forum/log":"Log In"
 ++  sigil
 :: ;+  (sig(size 48) src.bowl)
-=/  (scow %p src.bowl)
-;a/"/":"{p}"
+=/  p  (scow %p src.bowl)
+  ;div.f.g2
+    ;a/"/forum/add":"new post"
+    ;a/"/forum/usr/{p}":"{p}"
+  ==
 ++  $
-  ;nav.fs.g2
-    ;div.fg2
+  ;nav#topnav.fs.g2
+    ;div.f.g2
       ;div#nav-main.fs
         ;a/"/":"~  Technical Journal"
         ;div#nav-dropdown:"↓"
       ==
       ;div#nav-links
-        ;a:/"/information":"Information"
-        ;a:/"/Forum":"Forum"
+        ;a/"/information":"Information"
+        ;a.active/"/forum":"Forum"
       ==
     ==
-    ;+  login
+    ;div#login-div
+      ;+  login-prompt
+    ==
+    ;script:"{script}"
   ==
+++  script  ^~  %-  trip
+'''
+  async function setSigil(){
+    const div = document.getElementById("login-div");
+    const res = await fetch("/forum/f/sigil");
+    const t = await res.text();
+    if (t) div.innerHTML = t;
+  }  
+  setSigil();
+'''
 --

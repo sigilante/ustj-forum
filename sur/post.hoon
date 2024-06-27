@@ -17,7 +17,7 @@
   $:  =id
       author=ship
       thread=pid     
-      parent=(unit pid)
+      parent=pid
       children=(set pid)
       contents=content-list
       =votes
@@ -33,12 +33,14 @@
 +$  block
   $%  [%paragraph p=paragraph]
       [%blockquote p=paragraph]
-      :: table  
-      clist
       [%heading p=cord q=heading]
       [%media =media]
       [%codeblock code=cord lang=cord]
       [%eval hoon=cord]
+
+      
+      :: table  
+      clist
       [%tasklist p=(list task)]
       ::
       [%ref app=term =ship =path]
@@ -68,14 +70,9 @@
       [%strike p=cord]
       [%codespan p=cord]
       [%link href=cord show=cord]
+      [%img src=cord alt=cord]
       [%break ~]
       :: not strictly markdown
       [%ship p=ship]
-      [%date p=@da]
-      [%note id=cord text=(list inline)] :: footnotes and so on
-      [%underline p=cord]
-      [%sup p=cord]
-      [%sub p=cord]
-      [%ruby p=cord q=cord]
   ==
 --
