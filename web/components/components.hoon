@@ -33,9 +33,20 @@
       =pid  post-link
       ;+  (votes v)
       ;div:"{author}"
-      ;a/"/forum/com/{post-link}":"{ago} ago"
+      ;a/"/forum/ted/{post-link}":"{ago} ago"
       ;*  comments
     ==
+:: ++  delete-button
+::   |=  [is-admin=? is-ted=? post-link=tape]
+::   ?.  is-admin  ~
+::   =/  action  ?:  is-ted
+::     "/del-ted/{post-link}"
+::     "/del-com/{post-link}"
+::   ;+
+::   ;form(action action, method "post")
+::     ;input(type "submit"):"Delete"
+::   ==
+  
 ++  post-metadata
 |=  [=pid:tp now=@da v=votes:tp reply-count=@ud is-ted=?] 
   =/  teds  ?:  is-ted  "yeah"  "nope"

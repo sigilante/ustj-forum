@@ -27,7 +27,9 @@
 :_  this  init-cards:hd
 
 ++  on-load   |=  old=vase 
-:_  this(state !<(versioned-state old))  ~
+:_  this(state !<(versioned-state old))
+  :: :-  cache-root:cache  cache-static:cache
+  ~
 ++  on-watch  
 |=  =(pole knot)
   ?+  pole  !!
@@ -49,8 +51,33 @@
   ?:  ?=(%seed a)   teds:seed
   ?:  ?=(%seed2 a)  coms:seed
   ?:  ?=(%seed3 a)  reps:seed
+  ::  admin
+  ?:  ?=([%hr @p ?] a)   (handle-hr +.a)
+  ?:  ?=([%ban @p ?] a)  (handle-ban +.a)
+  ?:  ?=([%del-ted @t] a)  (handle-del .y +.a)
+  ?:  ?=([%del-com @t] a)  (handle-del .n +.a)
   ~&  wtf=a
   `this
+  ++  handle-del  |=  [is-ted=? uidt=@t]
+      =/  uid  (slaw:sr %uw uidt)  ?~  uid  !!
+      =/  cued  (cue u.uid)
+      =/  pid  %-  (soft pid:tp)  cued
+      ?~  pid  !!
+    =^  cards  state  
+    %+  handle-del:cache  is-ted  u.pid
+    [cards this]
+  ++  handle-hr  |=  [=ship w=?]
+    ?>  .=(src.bowl our.bowl)
+    =.  admins  ?:  w  
+      (~(put in admins) ship)
+      (~(del in admins) ship)
+    `this
+  ++  handle-ban  |=  [=ship w=?]
+    ?>  (~(has in admins) src.bowl)
+    =.  blacklist  ?:  w  
+      (~(put in blacklist) ship)
+      (~(del in blacklist) ship)
+    `this
   ++  handle-cache  |=  a=*  :_  this  
     =/  which  ($?(%root %ted %sta %all) a)
     ?-  which
@@ -75,6 +102,7 @@
     =/  rng  ~(. og eny.bowl)
     |%
     ++  teds
+    =.  admins  admins:const
     =/  titles  titles:seeds
     =.  state
     |-  ?~  titles  state
@@ -170,7 +198,6 @@
   ::
   ++  serve
   ^-  (quip card _this)
-  ~&  eyre-poke=now.bowl
   =/  order  !<(order:router vase)
   =/  address  address.req.order
   :: ?:  (~(has in banned.admin) address)  `this  

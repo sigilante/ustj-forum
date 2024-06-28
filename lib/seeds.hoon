@@ -36,7 +36,7 @@
 'South Korean telecom company attacks torrent users with malware '
 'Show HN: R2R V2 – A open source RAG engine with prod features '
 'From RSS to My Kindle '
-'How the STL Uses Explicit (quuxplusone.github.io)'
+'How the STL Uses Explicit'
 'The brain makes a lot of waste. Now scientists think they know where it goes'
 'The plan-execute pattern '
 '1Living Computers Museum to permanently close, auction vintage items '

@@ -20,11 +20,13 @@
   ==
 ++  script  ^~  %-  trip
 '''
-  function autoSave(){
+  function listeners(){
     const form = document.getElementById("form");
     const draftID = "new-thread";
+    const linkDiv = document.getElementById("thread-url");
     const area = document.getElementById("textarea");
 
+    // autosave
     window.addEventListener("load", () => {
       const savedContent = localStorage.getItem(draftID);
       console.log(savedContent, "saved")
@@ -37,7 +39,12 @@
       console.log("saving", area.value)
       localStorage.setItem(draftID, area.value);
     })
+    // toggler
+    linkDiv.addEventListener("input", () => {
+      if (linkDiv.value)  textarea.disabled = true;
+      else textarea.disabled = false;
+    });
   }
-  autoSave();
+  listeners();
 '''
 --

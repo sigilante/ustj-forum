@@ -1,11 +1,12 @@
 /-  tp=post
 |%
-+$  pokes  [%ui eyre-id=@ta p=ui-pokes]
++$  pokes  [%ui ship=@p eyre-id=@ta p=ui-pokes]
 +$  ui-pokes
   $%  [%submit-comment ted=thread text=@t]
       [%submit-reply =comment:tp text=@t]
       [%submit-thread title=@t url=@t text=@t]
       [%vote ted=? =pid:tp vote=?]
+      [%del ted=? =pid:tp]
   ==
 +$  state
 $%  state-0
@@ -19,6 +20,7 @@ $:  %0
     ::
     mods=(set @p)
     admins=(set @p)
+    blacklist=(set @p)
 ==
 +$  threads  ((mop pid:tp thread) ggth:tp)
 ++  torm     ((on pid:tp thread) ggth:tp)

@@ -17,5 +17,9 @@
       ;input(type "hidden", name "redirect", value redirect-str);
       ;button(name "eauth", type "submit"):"Login"
     ==
+    ;div.tc.nudge
+      ;p:"If you don't have an Urbit ID, click on this link to get one for free."
+      ;a.button/"https://redhorizon.com/join/2d55b768-a5f4-45cf-a4e5-a4302e05a1f9":"Get Urbit ID"
+    ==
   ==
 --

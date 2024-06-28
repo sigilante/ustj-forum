@@ -39,14 +39,12 @@
   ;<  res=client-response:iris  bind:m  take-client-response:strandio
   ?.  ?=(%finished -.res)  (strand-fail:strand %no-body ~)
   =/  headers  headers.response-header.res  
-  ~&  >  header=headers
   =/  redirect  (get-header:http 'location' headers)
     ~&  >>  red=redirect
     ?^  redirect  (pure:m [%| u.redirect])  
 
   ::
   ?~  full-file.res  (strand-fail:strand %no-body ~)
-  ~&  mime=-.u.full-file.res
   =/  htmls=@t  q.data.u.full-file.res
   =/  json  [%s htmls]
   (pure:m [%& json])

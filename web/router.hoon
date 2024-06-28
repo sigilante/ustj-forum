@@ -102,13 +102,13 @@
       ==
     ++  add-layout  |=  m=manx
       %-  layout  :~
-      (navbar bowl)
+      (navbar state bowl)
       m
       ==
     ++  serve-fragment  |=  =(pole knot)  ^-  manx
       ?+  pole  !!
         [%sigil ~]  
-          =/  navb  ~(. navbar bowl)  
+          =/  navb  ~(. navbar [state bowl])  
           =/  userdiv  login:navb
           userdiv
       ==
@@ -121,6 +121,7 @@
     ++  serve-index  |=  t=@t  ^-  manx
       =/  pag  (slaw %ud t)  ?~  pag  manx-bail
       =/  threads  (get-thread-page:lib u.pag state)
+      
       (index [u.pag threads] state bowl)
     ++  serve-comment  |=  uidt=@t  ^-  manx
       =/  uid  (slaw:sr %uw uidt)  ?~  uid  manx-bail
@@ -165,14 +166,32 @@
       [%new-thread ~]  handle-thread
       [%vote %ted uid=@t vote=@t ~]  (handle-vote .y uid.p vote.p)
       [%vote %com uid=@t vote=@t ~]  (handle-vote .n uid.p vote.p)
+      ::  admin
+      [%del-ted uid=@t ~]  (del .y uid.p)
+      [%del-com uid=@t ~]  (del .n uid.p)
     ==
+    ++  del
+      |=  [is-ted=? uidt=@t]
+      =/  uid  (slaw:sr %uw uidt)  ?~  uid  ~
+      =/  cued  (cue u.uid)
+      =/  pid  %-  (soft pid:tp)  cued
+      ?~  pid  ~
+      ?:  is-ted  
+        =/  ted  (get-thread:lib u.pid state)
+        ?~  ted  ~
+        (self-poke [%ui src.bowl eyre-id %del is-ted u.ted])
+        ::
+        =/  com  (get-comment:lib u.pid state)
+        ?~  com  ~
+        (self-poke [%ui src.bowl eyre-id %del is-ted u.com])
+
     ++  handle-vote  |=  [is-ted=? uidt=@t vote=@t]
       =/  vot=?  .=(vote 'gud')
       =/  uid  (slaw:sr %uw uidt)  ?~  uid  ~
       =/  cued  (cue u.uid)
       =/  pid  %-  (soft pid:tp)  cued
       ?~  pid  ~
-      (self-poke [%ui eyre-id %vote is-ted u.pid vot])
+      (self-poke [%ui src.bowl eyre-id %vote is-ted u.pid vot])
 
     ++  handle-thread
       ?~  body  ~
@@ -184,7 +203,7 @@
       ?~  title  ~
       =/  url  (~(get by bod) 'url')
       ?~  url  ~
-        (self-poke [%ui eyre-id %submit-thread u.title u.url u.md])
+        (self-poke [%ui src.bowl eyre-id %submit-thread u.title u.url u.md])
 
     ++  handle-reply  |=  top=?
       ?~  body  ~
@@ -201,11 +220,11 @@
       ?:  top  
         =/  ted  (get-thread:lib u.pid state)
         ?~  ted  ~
-        (self-poke [%ui eyre-id %submit-comment u.ted u.md])
+        (self-poke [%ui src.bowl eyre-id %submit-comment u.ted u.md])
         ::
         =/  com  (get-comment:lib u.pid state)
         ?~  com  ~
-        (self-poke [%ui eyre-id %submit-reply u.com u.md])
+        (self-poke [%ui src.bowl eyre-id %submit-reply u.com u.md])
     --
     ::
   ++  self-poke  |=  noun=*

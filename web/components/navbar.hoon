@@ -1,5 +1,6 @@
+/-  sur=forum
 /+  sig=sigil-sigil
-|_  =bowl:gall
+|_  [=state:sur =bowl:gall]
 ++  login  ^-  manx
   ?-  (clan:title src.bowl)
   %czar  sigil
@@ -10,22 +11,27 @@
   ==
 ++  login-prompt  ^-  manx
   ;a/"/forum/log":"Log In"
+++  new-post-link  ^-  marl
+  :: TODO reverse this
+  :: ?:  (~(has in admins.state) src.bowl)  ~
+  ;+  ;a/"/forum/add":"new post"
+  
 ++  sigil
 :: ;+  (sig(size 48) src.bowl)
 =/  p  (scow %p src.bowl)
   ;div.f.g2
-    ;a/"/forum/add":"new post"
+    ;*  new-post-link
     ;a/"/forum/usr/{p}":"{p}"
   ==
 ++  $
   ;nav#topnav.fs.g2
     ;div.f.g2
       ;div#nav-main.fs
-        ;a/"/":"~  Technical Journal"
+        ;a/"https://urbitsystems.tech/":"~  Technical Journal"
         ;div#nav-dropdown:"↓"
       ==
       ;div#nav-links
-        ;a/"/information":"Information"
+        ;a/"https://urbitsystems.tech/information":"Information"
         ;a.active/"/forum":"Forum"
       ==
     ==

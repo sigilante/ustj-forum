@@ -11,6 +11,7 @@
 |=  noun=*  ^-  [(list card) _state]
   =/  poke  (pokes:sur noun)
   ~&  ui-poke=poke
+  =.  src  ship.poke
   =/  eyre-id  eyre-id.poke
   |^
   ?-  -.p.poke
@@ -18,15 +19,17 @@
     %submit-comment  (handle-comment +.p.poke)
     %submit-reply    (handle-reply +.p.poke)
     %vote            (handle-vote +.p.poke)
+    %del             (handle-del +.p.poke)
   ==
+ 
   ++  handle-thread  |=  [title=@t url=@t text=@t]
     =/  =content:sur  ?.  .=('' url)  [%link url]  [%text (build-content:lib text)]
     =/  ted  (build-thread:lib title src now content)
     =.  state  (save-ted ted)
     :_  state  :+
       cache-root
-      (cache-ted ted)  
-      (redirect-ted ted)
+      (cache-ted pid.ted)  
+      (redirect-ted pid.ted)
 
     
   ++  handle-comment  |=  [ted=thread:sur text=@t]
@@ -35,8 +38,8 @@
     =.  state  (save-com com ted)
     :_  state  :+
       cache-root
-      (cache-ted ted)  
-      (redirect-ted ted)
+      (cache-ted pid.ted)  
+      (redirect-ted pid.ted)
     
   
 
@@ -49,7 +52,7 @@
   =.  state  (save-rep com par)
   :_  state  :*
       cache-root
-      (cache-ted u.ted)  
+      (cache-ted pid.u.ted)  
       (cache-com com)
       (cache-com par)
       (redirect-com par)
@@ -74,9 +77,9 @@
     =.  state  (save-karma ship.pid.ted vote)
     :_  state  :~
       cache-root
-      (cache-ted ted)  
+      (cache-ted pid.ted)  
       (cache-user ship.pid.ted)
-      :: (redirect-ted ted)
+      :: (redirect-ted pid.ted)
     ==
   ++  handle-com-vote  |=  [=pid:tp vote=?]
     =/  votesi=@si  (new:si vote 1)
@@ -102,8 +105,8 @@
   ::  redirectors
   ++  redirect-root  (redirect:router eyre-id "")
   
-  ++  redirect-ted  |=  ted=thread:sur
-    =/  link  (scow:sr %uw (jam pid.ted))
+  ++  redirect-ted  |=  =pid:tp
+    =/  link  (scow:sr %uw (jam pid))
     =/  url  "/ted/{link}"
     (redirect:router eyre-id url)
   ++  redirect-com  |=  com=comment:tp
@@ -113,8 +116,8 @@
   --
   ::  cache builders
   ++  cache-root  (cache-card "")
-  ++  cache-ted  |=  ted=thread:sur
-    =/  link  (scow:sr %uw (jam pid.ted))
+  ++  cache-ted  |=  =pid:tp
+    =/  link  (scow:sr %uw (jam pid))
     =/  url  "/ted/{link}"  
     (cache-card url)
   ++  cache-com  |=  com=comment:tp
@@ -127,7 +130,7 @@
     =/  teds  (tap:torm:sur threads)
     =.  l  |-  ?~  teds  l
       =/  ted=thread:sur  +.i.teds
-      =/  car  (cache-ted ted)
+      =/  car  (cache-ted pid.ted)
       $(teds t.teds, l [car l])
     :-  cache-root  l
   ++  cache-user  |=  who=@p  
@@ -148,7 +151,7 @@
     =/  teds  (tap:torm:sur threads)
     =.  l  |-  ?~  teds  l
       =/  ted=thread:sur  +.i.teds
-      =/  car  (cache-ted ted)
+      =/  car  (cache-ted pid.ted)
       $(teds t.teds, l [car l])
     =/  coms  (tap:gorm:tp comments)
     =.  l  |-  ?~  coms  l
@@ -179,6 +182,22 @@
     =.  par  par(children nc)
     =.  comments  (put:gorm:tp comments ppid par)
     state
+  ++  wipe-coms
+  |=  [ted=pid:tp]
+    =/  coms  (tap:gorm:tp comments)
+    |-  ?~  coms  comments
+      =/  com=comment:tp  +.i.coms
+      ?.  .=(ted thread.com)  $(coms t.coms)
+      =.  comments  +:(del:gorm:tp comments [author.com id.com])
+      $(coms t.coms)
+  ++  wipe-reps
+  |=  [par=pid:tp]
+    =/  coms  (tap:gorm:tp comments)
+    |-  ?~  coms  comments
+      =/  com=comment:tp  +.i.coms
+      ?.  .=(par parent.com)  $(coms t.coms)
+      =.  comments  +:(del:gorm:tp comments [author.com id.com])
+      $(coms t.coms)
   ++  save-karma  |=  [who=@p vote=?]
     =/  curr  (~(get by karma) who)
     =/  cur  ?~  curr  `@sd`0  u.curr
@@ -193,4 +212,42 @@
     =/  pl=simple-payload:http  (render:rout router-path)
     =/  entry=cache-entry:eyre  [.n %payload pl]
     [%pass /root %arvo %e %set-response pathc `entry]
+
+ ++  handle-del  |=  [is-ted=? =pid:tp]
+    ?:  is-ted  
+    =/  ted  (get-thread:lib pid state)
+    ?~  ted  `state
+    =.  threads  +:(del:torm:sur threads pid)
+    =.  comments  (wipe-coms pid)  
+    :_  state  :+
+      cache-root
+      (cache-ted pid)  
+      ~
+      :: redirect-root
+    ::
+    =|  l=(list card)
+    =/  ucom   (get-comment:lib pid state)
+    ?~  ucom  `state  =/  com  u.ucom
+    =.  comments  (wipe-reps pid)
+    =.  l  [(cache-com com) l]
+    
+    =/  upar   (get-comment:lib parent.com state)
+    ::  delete from child of parent
+    =.  comments  ?~  upar  comments
+      =/  par  u.upar
+      =/  nc  (~(del in children.par) pid)
+      =.  par  par(children nc)
+      =.  l  [(cache-com par) l]
+      (put:gorm:tp comments [author.par id.par] par)
+    ::  delete from reply of thread
+    =/  uted  (get-thread:lib thread.com state)
+    =.  threads  ?~  uted  threads
+      =/  ted  u.uted
+      =/  nr  %+  skip  replies.ted  |=  rp=pid:tp  .=(rp pid)
+      =.  ted  ted(replies nr)
+      =.  l  [(cache-ted pid.ted) l]
+      (put:torm:sur threads pid.ted ted)
+    :_  state  :-
+      cache-root
+      l
 --
