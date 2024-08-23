@@ -5,6 +5,7 @@
 ++  card  card:agent:gall
 +$  versioned-state
   $%  state-0
+      state-1
   ==
 --
 ::  main agent core
@@ -26,9 +27,12 @@
   ^-  (quip card _this)
   :_  this  init-cards:hd
 ++  on-load
-  |=  old=vase  :_  this(state !<(versioned-state old))
-  :: :-  cache-root:cache  cache-static:cache
-  ~
+  |=  =vase
+  =/  old  !<(versioned-state vase)
+  ?-  old
+    %0  this(state [%1 +.old ~])
+    %1  this(state old)
+  ==
 ++  on-watch
   |=  =(pole knot)
   ?+  pole  !!
@@ -37,14 +41,12 @@
 ++  on-poke
   |=  [=mark =vase]
   |^
-  ~&  >  mark
   ?+  mark  `this
     %handle-http-request  serve
     %noun  (on-poke-noun !<(* vase))
   ==
   ++  on-poke-noun
     |=  a=*
-    ~&  >>>  ;;(@tas -.a)
     ?:  ?=([%ui *] a)     (handle-ui a)
     ?:  ?=([%cache *] a)  (handle-cache +.a)
     ?:  ?=(%test a)   test

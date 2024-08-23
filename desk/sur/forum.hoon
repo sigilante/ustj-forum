@@ -8,10 +8,12 @@
       [%submit-thread title=@t url=@t text=@t]
       [%vote ted=? =pid:tp vote=?]
       [%del ted=? =pid:tp]
+      [%auth who=@p secret=@uv adr=tape sig=tape]
   ==
 ::
 +$  state
   $%  state-0
+      state-1
   ==
 +$  state-0
   $:  %0
@@ -23,6 +25,11 @@
       mods=(set @p)
       admins=(set @p)
       blacklist=(set @p)
+  ==
++$  state-1
+  $:  %1
+      state-0
+      sessions=(set @p)
   ==
 ::
 +$  threads  ((mop pid:tp thread) ggth:tp)
