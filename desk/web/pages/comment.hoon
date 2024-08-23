@@ -1,22 +1,22 @@
 /-  sur=forum, tp=post
 /+  lib=forum, sr=sortug
 /=  comps  /web/components/components
-/=  pt  /web/components/post-text
+/=  pt     /web/components/post-text
 |_  [ted=thread:sur op=full-node:tp =bowl:gall]
-
 ++  comments
   ;div#comments
     ;+  (grandchildren op 0)
   ==
-
-++  mini-thread 
-=|  nested=@ud
-|=  fn=full-node:tp  ^-  manx
+++  mini-thread
+  =|  nested=@ud
+  |=  fn=full-node:tp
+  ^-  manx
   ;li.comment
     ;+  (comment p.fn)
     ;+  (grandchildren fn +(nested))
   ==
-++  grandchildren  |=  [fn=full-node:tp nested=@ud]
+++  grandchildren
+  |=  [fn=full-node:tp nested=@ud]
   =/  pid  [author.p.fn id.p.fn]
   ?~  children.fn  ;span;
   ?:  (gth nested 5)  (show-more pid)
@@ -26,14 +26,15 @@
     ;*  %+  turn  children  |=  [p=pid:tp fnc=full-node:tp]
       (mtf(nested nested) fnc)
   ==
-
-++  show-more  |=  =pid:tp
+++  show-more
+  |=  =pid:tp
   =/  pids  (scow:sr %uw (jam pid))
   ;div.show-more-button.uln
     =pid  pids
     ; Show more
   ==
-++  comment  |=  c=comment:tp
+++  comment
+  |=  c=comment:tp
   =/  pid  [author.c id.c]
   =/  pids  (scow:sr %uw (jam pid))
   ;div.comment-proper
@@ -46,7 +47,6 @@
 ++  $
   =/  ppid  [author.p.op id.p.op]
   =/  pids  (scow:sr %uw (jam ppid))
-
   ;main#thread-main
     ;+  (reply-header:comps ted p.op now.bowl)
     ;div#thread-body
@@ -61,7 +61,9 @@
     ;+  comments
     ;script:"{reply-script}"
   ==
-++  reply-script  ^~  %-  trip  
+++  reply-script
+  ^~
+  %-  trip
 '''
   function replyToggle(){
     const el = document.getElementById("comment-prompt");
@@ -74,7 +76,9 @@
   }
   replyToggle();
 '''
-++  og-script  ^~  %-  trip  
+++  og-script
+  ^~
+  %-  trip
 '''
   async function run(){
     const urlEl = document.getElementById("og");
@@ -93,7 +97,7 @@
       const name = tag.getAttribute("name");
       const prop = tag.getAttribute("property");
       const cont = tag.getAttribute("content");
-    
+ 
       if (name && name.includes("image")){
         setImage(url, cont);
         break;
@@ -109,6 +113,5 @@
     el.src = url;
   }
   run();
-  
 '''
 --

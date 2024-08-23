@@ -1,38 +1,37 @@
 /-  sur=forum, tp=post
 /+  lib=forum, sr=sortug
 /=  comps  /web/components/components
-/=  pt  /web/components/post-text
+/=  pt     /web/components/post-text
 |_  [ted=thread:sur comment-list=(list full-node:tp) =bowl:gall]
 ++  body
-  ?:  ?=(%link -.content.ted)  
-      ;+  link-body  
-      (content:pt +.content.ted)
+  ?:  ?=(%link -.content.ted)
+  ;+  link-body
+  (content:pt +.content.ted)
 ++  link-body
-    ?>  ?=(%link -.content.ted)
-    =/  url  (trip +.content.ted)
-    ;a/"{url}"
-    ;div#og
+  ?>  ?=(%link -.content.ted)
+  =/  url  (trip +.content.ted)
+  ;a/"{url}"
+  ;div#og
     =url  url
       ;img#link-image;
       ;div#link-url:"{url}"
     ;script:"{og-script}"
-    ==
-    ==
+  ==  ==
 ++  comments
   ;div#comments
   ;ul.comment-thread
     ;*  %+  turn  comment-list  mini-thread
-  ==
-  ==
-
-++  mini-thread 
-=|  nested=@ud
-|=  fn=full-node:tp  ^-  manx
+  ==  ==
+++  mini-thread
+  =|  nested=@ud
+  |=  fn=full-node:tp
+  ^-  manx
   ;li.comment
     ;+  (comment p.fn)
     ;+  (grandchildren fn +(nested))
   ==
-++  grandchildren  |=  [fn=full-node:tp nested=@ud]
+++  grandchildren
+  |=  [fn=full-node:tp nested=@ud]
   =/  pid  [author.p.fn id.p.fn]
   ?~  children.fn  ;span;
   ?:  (gth nested 5)  (show-more pid)
@@ -42,14 +41,15 @@
     ;*  %+  turn  children  |=  [p=pid:tp fnc=full-node:tp]
       (mtf(nested nested) fnc)
   ==
-
-++  show-more  |=  =pid:tp
+++  show-more
+  |=  =pid:tp
   =/  pids  (scow:sr %uw (jam pid))
   ;div.show-more-button.uln
     =pid  pids
     ; Show more
   ==
-++  comment  |=  c=comment:tp
+++  comment
+  |=  c=comment:tp
   =/  pid  [author.c id.c]
   =/  pids  (scow:sr %uw (jam pid))
   ;div.comment-proper
@@ -63,7 +63,6 @@
   =/  op  (scow %p ship.pid.ted)
   =/  op-ago  (post-date-ago:lib id.pid.ted now.bowl %yau)
   =/  pids  (scow:sr %uw (jam pid.ted))
-
   ;main#thread-main
     ;a.return-link/"/forum":"Return to forum"
     ;+  (post-metadata:comps pid.ted now.bowl votes.ted (lent replies.ted) .y)
@@ -80,8 +79,10 @@
     ;+  comments
     ;script:"{reply-script}"
   ==
-++  reply-script  ^~  %-  trip  
-'''
+++  reply-script
+  ^~
+  %-  trip
+  '''
   function replyToggle(){
     const el = document.getElementById("comment-prompt");
     if (!el) return
@@ -125,10 +126,10 @@
     }
   }
   voting();
-
-  
-'''
-++  og-script  ^~  %-  trip  
+  '''
+++  og-script
+  ^~
+  %-  trip
 '''
   async function run(){
     const urlEl = document.getElementById("og");
@@ -160,7 +161,7 @@
     } catch(e){
       console.log(e, "wtf")
     }
-    
+ 
   }
   function getMeta(url, s){
     const parser = new DOMParser();
@@ -172,7 +173,7 @@
       const prop = tag.getAttribute("property");
       const cont = tag.getAttribute("content");
       const isImage = (name && name.includes("image") || (prop && prop.includes("image")))
-    
+ 
       if (isImage){
         setImage(url, cont);
         break;
@@ -188,6 +189,5 @@
     el.src = url;
   }
   run();
-  
 '''
 --

@@ -6,11 +6,12 @@
 ++  $
   ;main#thread-main
     ;h1.tc:"New Thread"
+    ;p:"You may either submit a link or write a text post."
     ;div#thread-composer
       ;div#composer-proper
       ;form#form(action "new-thread", method "POST")
         ;input#thread-title(type "text", name "title", placeholder "title");
-        ;input#thread-url(type "text", name "url", placeholder "url");
+        ;input#thread-url(type "text", name "url", placeholder "https://urbit.org/");
         ;textarea#textarea(name "text");
         ;button:"Submit"
         ;script:"{script}"
