@@ -59,6 +59,32 @@ html {
   font-family: Urbit Sans
 }
 
+/* urbit intranav color scheme  */
+.wit {
+  --muted: #14140F;
+  --primary: #F8FAF8;
+}
+/* fdn intranav color scheme  */
+.mos {
+  --muted: #5A5A55;
+  --primary: #C3CDC3;
+}
+/* roadmap intranav color scheme  */
+.mos-light {
+  --muted: #A3ABA3;
+  --primary: #54544F;
+}
+/* docs intranav color scheme  */
+.blu {
+  --muted: #5A5A6E;
+  --primary: #A0DCE6;
+}
+/* network explorer intranav color scheme  */
+.gry {
+  --muted: #141A14;
+  --primary: #C8C8C8
+}
+
 /* utility */
 .f {
   display: flex;
@@ -127,8 +153,8 @@ a {
   background-color: var(--black);
   color: var(--primary);
   cursor: pointer;
-  font-size: 25px;
-  line-height: 23px;
+  font-size: 24px;
+  line-height: 30px;
   font-weight: 600;
   text-align: center;
   display: flex;
@@ -140,8 +166,8 @@ a {
 #nav-links {
   display: flex;
   align-items: center;
-  font-size: 25px;
-  line-height: 23px;
+  font-size: 24px;
+  line-height: 30px;
   font-weight: 600;
   text-align: center;
   gap: 1rem;
