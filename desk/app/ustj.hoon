@@ -37,12 +37,14 @@
 ++  on-poke
   |=  [=mark =vase]
   |^
+  ~&  >  mark
   ?+  mark  `this
     %handle-http-request  serve
     %noun  (on-poke-noun !<(* vase))
   ==
   ++  on-poke-noun
     |=  a=*
+    ~&  >>>  ;;(@tas -.a)
     ?:  ?=([%ui *] a)     (handle-ui a)
     ?:  ?=([%cache *] a)  (handle-cache +.a)
     ?:  ?=(%test a)   test
@@ -94,6 +96,7 @@
     ==
   ++  handle-ui
     |=  noun=*
+    ~&  'here'
     =^  cards  state  (handle-ui:cache noun)
     [cards this]
   ++  test
@@ -116,11 +119,16 @@
       =^  r1  rng  (rads:rng 100)
       =/  coinflip=?  (lte 50 r1)
       =/  =content  ?:  coinflip
-        =/  ind  (rad:rng (lent links:seeds))         =/  url  (snag ind links:seeds)
-          [%link url]         =/  ind  (rad:rng (lent md:seeds))         =/  md  (snag ind md:seeds)
+          =/  ind  (rad:rng (lent links:seeds))
+          =/  url  (snag ind links:seeds)
+          [%link url]
+        =/  ind  (rad:rng (lent md:seeds))
+        =/  md  (snag ind md:seeds)
         =/  cl  (build-content:lib md)
-          [%text cl]
-      =/  author          =/  ind  (rad:rng (lent authors:seeds))          (snag ind authors.seeds)
+        [%text cl]
+      =/  author
+        =/  ind  (rad:rng (lent authors:seeds))
+        (snag ind authors.seeds)
       =/  date  (sub now.bowl (mul ~h1 (rad:rng 500)))
       =/  ted  (build-thread:lib i.titles author date content)
       =/  tally  (new:si [coinflip (rad:rng 1.000)])
@@ -184,12 +192,16 @@
       ?~  l  coms
       =^  r1  rng  (rads:rng 100)
       =/  coinflip=?  (lte 50 r1)
-      =/  content         =/  ind  (rad:rng (lent md:seeds))         =/  md  (snag ind md:seeds)
+      =/  contents
+        =/  ind  (rad:rng (lent md:seeds))
+        =/  md  (snag ind md:seeds)
         (build-content:lib md)
-      =/  author         =/  ind  (rad:rng (lent authors:seeds))         (snag ind authors.seeds)
+      =/  author
+        =/  ind  (rad:rng (lent authors:seeds))
+        (snag ind authors.seeds)
       =/  date  (sub now.bowl (mul ~h1 (rad:rng 500)))
       =.  bowl  bowl(src author, now date)
-      =/  com  (build-comment:lib content bowl tpid ppid)
+      =/  com  (build-comment:lib contents bowl tpid ppid)
       =/  tally  (new:si [coinflip (rad:rng 1.000)])
       =.  com  com(votes [tally ~])
       $(l t.l, coms [com coms])

@@ -1,4 +1,5 @@
 /-  tp=post
+::
 |%
 +$  pokes  [%ui ship=@p eyre-id=@ta p=ui-pokes]
 +$  ui-pokes
@@ -8,26 +9,33 @@
       [%vote ted=? =pid:tp vote=?]
       [%del ted=? =pid:tp]
   ==
+::
 +$  state
-$%  state-0
-==
+  $%  state-0
+  ==
 +$  state-0
-$:  %0
-    =threads
-    popular=pfeed
-    comments=gfeed:tp
-    karma=(map @p @sd)
-    ::
-    mods=(set @p)
-    admins=(set @p)
-    blacklist=(set @p)
-==
+  $:  %0
+      =threads
+      popular=pfeed
+      comments=gfeed:tp
+      karma=(map @p @sd)
+      ::
+      mods=(set @p)
+      admins=(set @p)
+      blacklist=(set @p)
+  ==
+::
 +$  threads  ((mop pid:tp thread) ggth:tp)
 ++  torm     ((on pid:tp thread) ggth:tp)
 +$  pfeed    ((mop sd pid:tp) cmp)
 ++  porm     ((on sd pid:tp) cmp)
 +$  sd  [s=? d=@ud]
-++  cmp  |=  [a=sd b=sd]  ?:  .=(s.a s.b)  (gte d.a d.b)  s.a
+++  cmp
+  |=  [a=sd b=sd]
+  ?.  .=(s.a s.b)
+    s.a
+  (gte d.a d.b)
+::
 +$  thread-page
   $:  page=@ud
       threads=(list thread)

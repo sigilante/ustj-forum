@@ -146,7 +146,6 @@
   |=  [title=@t author=@p date=@da =content:sur]
   ^-  thread:sur
   =|  t=thread:sur
-  ~&  >>  [title author date content]
   %=  t
     pid       [author date]
     title     title

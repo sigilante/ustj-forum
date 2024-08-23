@@ -1,18 +1,16 @@
 |%
 +$  id  @da
 +$  pid  [=ship =id]
-:: anon post type?
-
-
-::  instead of using this I'm just gonna jam old names
+::
 +$  votes
   $:  tally=@sd
       leger=(map @p ?)
   ==
-
+::
 +$  gfeed  ((mop pid comment) ggth)
 ++  gorm   ((on pid comment) ggth)
 ++  ggth   |=([[shipa=@p a=time] [shipb=@p b=time]] (gth a b))
+::
 +$  comment
   $:  =id
       author=ship
@@ -22,12 +20,10 @@
       contents=content-list
       =votes
   ==
-
-
+::
 +$  full-node  [p=comment children=$~(~ full-graph)]
 +$  full-graph  ((mop pid full-node) ggth)
 ++  form  ((on pid full-node) ggth)
-
 ::  content
 +$  content-list  (list block)
 +$  block
@@ -37,8 +33,6 @@
       [%media =media]
       [%codeblock code=cord lang=cord]
       [%eval hoon=cord]
-
-      
       :: table  
       clist
       [%tasklist p=(list task)]
@@ -50,10 +44,11 @@
 +$  paragraph  (list inline)
 :: man tables are a rabbit hole. we'll get to it
 ++  table
-|^        [%table headers=(list cell) rows=(list row)]
-+$  row   (list cell)
-+$  cell  content-list
---
+  |^
+  [%table headers=(list cell) rows=(list row)]
+  +$  row   (list cell)
+  +$  cell  content-list
+  --
 +$  clist  [%list p=(list li) ordered=?]
 +$  li     content-list
 +$  task  [p=paragraph q=?]

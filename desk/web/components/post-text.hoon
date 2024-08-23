@@ -2,10 +2,13 @@
 /+  sr=sortug
 |%
 ++  content
-|=  c=content-list:tp  ^-  marl
+  |=  c=content-list:tp
+  ^-  marl
   (turn c block)
+::
 ++  block
-  |=  b=block:tp  ^-  manx
+  |=  b=block:tp
+  ^-  manx
   ?+  -.b  ;p;
     %paragraph   (pg +.b)
     %blockquote  (bq +.b)
@@ -14,29 +17,30 @@
     %media       (media +.b)
     %codeblock   (codeblock +.b)
     %eval        (eval +.b)
-    ==
+  ==
 ++  eval
-  |=  txt=@t  ^-  manx
-  :: Ream can crash if the cord is wrong
-  ::  soften instead
+  |=  txt=@t
+  ^-  manx
+  ::  +ream can crash if the cord is wrong, so soften instead
   =/  uhoon  (rush txt vest)
   ?~  uhoon  ;p:"The hoon you tried to run ({(trip txt)}) is invalid."
-  =/  run  %-  mule  |.
-  %+  slap  !>(..zuse)  u.uhoon
+  =/  run  (mule |.((slap !>(..zuse) u.uhoon)))
   ?:  ?=(%.n -.run)  ::  if virtualization fails get a (list tank)
-  ;p
-   ;span:"Evaluation of {(trip txt)} failed:"
-   ;br;
-   ;*  %+  turn  p.run  |=  t=tank  ;span:"{~(ram re t)}"
-  ==
+    ;p
+    ;span:"Evaluation of {(trip txt)} failed:"
+    ;br;
+    ;*  %+  turn  p.run  |=  t=tank  ;span:"{~(ram re t)}"
+    ==
   ;p:"{(text p.run)}"
 ++  pg
-  |=  l=(list inline:tp)  ^-  manx
+  |=  l=(list inline:tp)
+  ^-  manx
   ;p
   ;*  %+  turn  l  inline
   ==
 ++  bq
-  |=  l=(list inline:tp)  ^-  manx
+  |=  l=(list inline:tp)
+  ^-  manx
   ;blockquote
   ;*  %+  turn  l  inline
   ==
@@ -55,14 +59,16 @@
     ;*  (turn l block)
   ==
 ++  media
-  |=  m=media:tp  ^-  manx
+  |=  m=media:tp
+  ^-  manx
   ?-  -.m
-  %video  ;video@"{(trip p.m)}";
-  %audio  ;audio@"{(trip p.m)}";
-  %images  ;div.images
-             ;*  %+  turn  p.m
-             |=  [url=@t caption=@t]  ;img@"{(trip url)}"(alt (trip caption));
-           ==
+    %video    ;video@"{(trip p.m)}";
+    %audio    ;audio@"{(trip p.m)}";
+    %images   ;div.images
+                ;*  %+  turn  p.m
+                  |=  [url=@t caption=@t]
+                  ;img@"{(trip url)}"(alt (trip caption));
+                ==
   ==
 ++  codeblock
   |=  [code=@t lang=@t]  :: TODO lang suff
@@ -70,7 +76,8 @@
     ;code:"{(trip code)}"
   ==
 ++  heading
-  |=  [pp=@t q=@]  ^-  manx
+  |=  [pp=@t q=@]
+  ^-  manx
   =/  p  (trip pp)
   ?:  .=(1 q)  ;h1:"{p}"
   ?:  .=(2 q)  ;h2:"{p}"
@@ -80,7 +87,8 @@
   ?:  .=(6 q)  ;h6:"{p}"
   ;p:""
 ++  inline
-  |=  l=inline:tp  ^-  manx
+  |=  l=inline:tp
+  ^-  manx
   ?+  -.l  ;span;
     %text      (parse-text p.l)
     %italic    ;i:"{(trip p.l)}"
@@ -100,7 +108,8 @@
                 ==
   ==
 ++  parse-text
-  |=  txt=@t  ^-  manx
+  |=  txt=@t
+  ^-  manx
   =/  tpe  (trip txt)
   =/  youtube  (rush txt youtube:parsing:sr)
   ?^  youtube  
