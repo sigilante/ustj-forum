@@ -1,5 +1,6 @@
 /-  sur=forum, tp=post
-/+  lib=forum, sr=sortug, cons=constants
+/+  lib=forum, sr=sortug, cons=constants,
+    naive, ethereum
 /=  router  /web/router
 ::
 |_  [state:sur bowl:gall]
@@ -63,7 +64,7 @@
   ++  handle-ted-vote
     |=  [=pid:tp vote=?]
     =/  votesi=@si  (new:si vote 1)
-    =/  uted  (get-thread:lib pid state)
+    =/  uted  (get-thread:lib pid state)  ?~  uted  `state
     =/  ted  u.uted
     =/  v  votes.ted
     =/  nv  %=  v
@@ -103,14 +104,10 @@
   ++  handle-auth
     |=  [who=@p secret=@uv adr=tape sig=tape]
     |^
-    (validate who secret adr sig)
-    =.  state  (put-user:lib patp auth state)
-    :_  state  :+
-        cache-root
-      (cache-user patp)
-    ==
+    ?>  (validate who secret adr sig)
+    `state
     ++  validate
-      |=  [who=@p challenge=secret:ud address=tape hancock=tape]
+      |=  [who=@p challenge=secret:sur address=tape hancock=tape]
       ^-  ?
       =/  addy  (from-tape address)
       =/  cock  (from-tape hancock)

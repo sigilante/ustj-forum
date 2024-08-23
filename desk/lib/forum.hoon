@@ -86,7 +86,8 @@
   ?.  .=(ship.pid.ted who)  $(l t.l)
   =/  nteds  (put:torm:sur teds pid.ted ted)
   $(l t.l, teds nteds)
-++  get-user-coms   |=  [who=@p =state:sur]
+++  get-user-coms
+  |=  [who=@p =state:sur]
   ^-  gfeed:tp
   =|  gf=gfeed:tp
   =/  l  (tap:gorm:tp comments.state)

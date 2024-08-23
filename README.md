@@ -14,3 +14,9 @@ Created by ~polwex for the Urbit Foundation.
 :: untested
 > :ustj [%ui %del-ted 'w0003jlC~ESp0g0000000040vzC2w081']
 ```
+
+- stupid compiler thing ++on-fail
+- how to get script to run for MetaMask login form
+  - script has access to challenge
+- make sure to check sessions as appropriate
+- time out challenges after 15 minutes

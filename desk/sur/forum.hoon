@@ -12,8 +12,7 @@
   ==
 ::
 +$  state
-  $%  state-0
-      state-1
+  $%  state-1
   ==
 +$  state-0
   $:  %0
@@ -28,10 +27,20 @@
   ==
 +$  state-1
   $:  %1
-      state-0
-      sessions=(set @p)
+      =threads
+      popular=pfeed
+      comments=gfeed:tp
+      karma=(map @p @sd)
+      ::
+      mods=(set @p)
+      admins=(set @p)
+      blacklist=(set @p)
+      sessions=(map comet=@p id=@p)
+      =challenges
   ==
 ::
++$  secret      @uv
++$  challenges  (set secret)
 +$  threads  ((mop pid:tp thread) ggth:tp)
 ++  torm     ((on pid:tp thread) ggth:tp)
 +$  pfeed    ((mop sd pid:tp) cmp)

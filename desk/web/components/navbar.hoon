@@ -4,20 +4,24 @@
 |_  [=state:sur =bowl:gall]
 ++  login
   ^-  manx
-  ?-  (clan:title src.bowl)
+  ?-  (clan:title get-id)
     %czar  sigil
     %king  sigil
     %duke  sigil
     %earl  sigil
     %pawn  login-prompt
   ==
+++  get-id
+  ^-  @p
+  ?.  =(%pawn (clan:title src.bowl))  src.bowl
+  (~(got by sessions.state) src.bowl)
 ++  login-prompt
   ^-  manx
   ;a/"/forum/log":"Log In"
 ++  new-post-link
   ^-  marl
   ?:  (~(has in admins.state) src.bowl)  ~
-  ;+  ;a/"/forum/add":"new post"  
+  ;+  ;a/"/forum/add":"new post"
 ++  sigil
 :: ;+  (sig(size 48) src.bowl)
 =/  p  (scow %p src.bowl)
@@ -51,7 +55,7 @@
     const res = await fetch("/forum/f/sigil");
     const t = await res.text();
     if (t) div.innerHTML = t;
-  }  
+  } 
   setSigil();
 '''
 --

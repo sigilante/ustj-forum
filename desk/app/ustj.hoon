@@ -1,5 +1,11 @@
 /-  *forum
-/+  dbug, sr=sortug, lib=forum, const=constants, seeds, cacher
+/+  dbug,
+    default-agent,
+    sr=sortug,
+    lib=forum,
+    const=constants,
+    seeds,
+    cacher
 /=  router     /web/router
 |%
 ++  card  card:agent:gall
@@ -10,18 +16,19 @@
 --
 ::  main agent core
 %-  agent:dbug
-=|  versioned-state
+=|  state-1
 =*  state  -
 ^-  agent:gall
 =<
 ::
 |_  =bowl:gall
-+*  this      .
-    hd      ~(. +> [state bowl])
-    rout    ~(. router:router [state bowl])
-    cache   ~(. cacher [state bowl])
-++  on-fail   |~(* `this)
-++  on-leave  |~(* `this)
++*  this       .
+    default  ~(. (default-agent this %|) bowl)
+    hd       ~(. +> [state bowl])
+    rout     ~(. router:router [state bowl])
+    cache    ~(. cacher [state bowl])
+++  on-fail   on-fail:default
+++  on-leave  on-leave:default
 ++  on-save   !>(state)
 ++  on-init
   ^-  (quip card _this)
@@ -29,9 +36,23 @@
 ++  on-load
   |=  =vase
   =/  old  !<(versioned-state vase)
-  ?-  old
-    %0  this(state [%1 +.old ~])
-    %1  this(state old)
+  ?-    -.old
+      %0
+    %=  this
+      state  $:  %1
+                 threads.old
+                 popular.old
+                 comments.old
+                 karma.old
+                 mods.old
+                 admins.old
+                 blacklist.old
+                 sessions=~
+                 challenges=~
+             ==
+    ==
+      %1
+    this(state old)
   ==
 ++  on-watch
   |=  =(pole knot)
@@ -98,7 +119,6 @@
     ==
   ++  handle-ui
     |=  noun=*
-    ~&  'here'
     =^  cards  state  (handle-ui:cache noun)
     [cards this]
   ++  test
