@@ -1,7 +1,9 @@
 /-  sur=forum
 /+  sig=sigil-sigil
+::
 |_  [=state:sur =bowl:gall]
-++  login  ^-  manx
+++  login
+  ^-  manx
   ?-  (clan:title src.bowl)
   %czar  sigil
   %king  sigil
@@ -9,13 +11,17 @@
   %earl  sigil
   %pawn  login-prompt
   ==
-++  login-prompt  ^-  manx
+++  get-id
+  ^-  @p
+  ?.  =(%pawn (clan:title src.bowl))  src.bowl
+  (~(got by sessions.state) src.bowl)
+++  login-prompt
+  ^-  manx
   ;a/"/forum/log":"Log In"
-++  new-post-link  ^-  marl
-  :: TODO reverse this
-  :: ?:  (~(has in admins.state) src.bowl)  ~
+++  new-post-link
+  ^-  marl
+  ?:  (~(has in admins.state) src.bowl)  ~
   ;+  ;a/"/forum/add":"new post"
-  
 ++  sigil
 :: ;+  (sig(size 48) src.bowl)
 =/  p  (scow %p src.bowl)
@@ -40,7 +46,9 @@
     ==
     ;script:"{script}"
   ==
-++  script  ^~  %-  trip
+++  script
+  ^~
+  %-  trip
 '''
   async function setSigil(){
     const div = document.getElementById("login-div");

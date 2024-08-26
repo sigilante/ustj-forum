@@ -1,5 +1,6 @@
 /-  sur=forum, tp=post
-/+  lib=forum, sr=sortug, rd=rudder, cons=constants
+/+  lib=forum, sr=sortug, rd=rudder, cons=constants,
+    naive, ethereum
 /+  server
 ::  pages and components
 /=  layout        /web/layout
@@ -96,6 +97,7 @@
     |=  rl=request-line:server
     ^-  manx
     =/  p=(pole knot)  site.rl
+    ::
     ?:  ?=([%f rest=*] p)  (serve-fragment rest.p)
     %-  add-layout
     ?+  p  manx-bail
@@ -181,6 +183,12 @@
       ::  admin
       [%del-ted uid=@t ~]  (del .y uid.p)
       [%del-com uid=@t ~]  (del .n uid.p)
+      ::
+        [%auth *]
+      ?~  body  ~|(%empty-auth-request !!)
+      =/  jon  (de:json:html q.u.body)
+      ?~  jon  ~|(%empty-auth-json !!)
+      (handle-auth u.jon)
     ==
     ++  del
       |=  [is-ted=? uidt=@t]
@@ -224,6 +232,76 @@
         (self-poke [%ui src.bowl eyre-id %submit-comment u.ted u.md])
       =/  com  (get-comment:lib u.pid state)  ?~  com  ~
       (self-poke [%ui src.bowl eyre-id %submit-reply u.com u.md])
+    ::  MetaMask authentication request; others go via EAuth.
+    ::  Modified from ~rabsef-bicrym's %mask by ~hanfel-dovned.
+    ++  handle-auth
+      |=  [body=json]
+      ^-  (list card:agent:gall)
+      |^
+      =/  axn  (dejs-action body)
+      ?>  (validate who.axn secret.axn adr.axn sig.axn)
+      (self-poke [%ui %auth who.axn secret.axn])
+      ++  validate
+        |=  [who=@p challenge=secret:sur address=tape hancock=tape]
+        ^-  ?
+        =/  addy  (from-tape address)
+        =/  cock  (from-tape hancock)
+        =/  owner  (get-owner who)  ?~  owner  %.n
+        ?.  =(addy u.owner)  %.n
+        ?.  (~(has in challenges.state) challenge)  %.n
+        =/  note=@uvI
+          =+  octs=(as-octs:mimes:html (scot %uv challenge))
+          %-  keccak-256:keccak:crypto
+          %-  as-octs:mimes:html
+          ;:  (cury cat 3)
+            '\19Ethereum Signed Message:\0a'
+            (crip (a-co:co p.octs))
+            q.octs
+          ==
+        ?.  &(=(20 (met 3 addy)) =(65 (met 3 cock)))  %.n
+        =/  r  (cut 3 [33 32] cock)
+        =/  s  (cut 3 [1 32] cock)
+        =/  v=@
+          =+  v=(cut 3 [0 1] cock)
+          ?+  v  !!
+            %0   0
+            %1   1
+            %27  0
+            %28  1
+          ==
+        ?.  |(=(0 v) =(1 v))  %.n
+        =/  xy
+          (ecdsa-raw-recover:secp256k1:secp:crypto note v r s)
+        =/  pub  :((cury cat 3) y.xy x.xy 0x4)
+        =/  add  (address-from-pub:key:ethereum pub)
+        =(addy add)
+      ::
+      ++  from-tape
+        |=(h=tape ^-(@ux (scan h ;~(pfix (jest '0x') hex))))
+      ::
+      ++  get-owner
+        |=  who=@p
+        ^-  (unit @ux)
+        =-  ?~  pin=`(unit point:naive)`-
+              ~
+            ?.  |(?=(%l1 dominion.u.pin) ?=(%l2 dominion.u.pin))
+              ~
+            `address.owner.own.u.pin
+        .^  (unit point:naive)
+          %gx
+          %+  en-beam
+            [our.bowl %azimuth [%da now.bowl]]
+          /point/(scot %p who)/noun
+        ==
+      ++  dejs-action
+        |=  jon=json
+        ^-  authorization:sur
+        =,  dejs:format
+        %.  jon
+        %-  of
+        :~  [%auth (ot ~[who+(se %p) secret+(se %uv) address+sa signature+sa])]
+        ==
+      --
     --
   ::
   ++  self-poke

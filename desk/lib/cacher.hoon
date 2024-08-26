@@ -1,5 +1,6 @@
 /-  sur=forum, tp=post
-/+  lib=forum, sr=sortug, cons=constants
+/+  lib=forum, sr=sortug, cons=constants,
+    naive, ethereum
 /=  router  /web/router
 ::
 |_  [state:sur bowl:gall]

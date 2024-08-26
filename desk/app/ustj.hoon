@@ -1,8 +1,13 @@
 /-  *forum
-/+  dbug, sr=sortug, lib=forum, const=constants, seeds, cacher
+/+  dbug,
+    sr=sortug,
+    lib=forum,
+    const=constants,
+    seeds,
+    cacher
 /=  router     /web/router
 |%
-++  card  card:agent:gall
++$  card  card:agent:gall
 +$  versioned-state
   $%  state-0
   ==
@@ -19,32 +24,30 @@
     hd      ~(. +> [state bowl])
     rout    ~(. router:router [state bowl])
     cache   ~(. cacher [state bowl])
-++  on-fail   |~(* `this)
-++  on-leave  |~(* `this)
-++  on-save   !>(state)
 ++  on-init
   ^-  (quip card _this)
-  :_  this  init-cards:hd
+  :-  init-cards:hd
+  this(admins admins:const)
 ++  on-load
   |=  old=vase  :_  this(state !<(versioned-state old))
-  :: :-  cache-root:cache  cache-static:cache
   ~
+++  on-save   !>(state)
 ++  on-watch
   |=  =(pole knot)
   ?+  pole  !!
-    [%http-response id=@ ~]    `this
+    [%http-response id=@ ~]    [~ this]
   ==
+++  on-leave  |~(* [~ this])
 ++  on-poke
   |=  [=mark =vase]
   |^
   ~&  >  mark
-  ?+  mark  `this
+  ?+  mark  [~ this]
     %handle-http-request  serve
     %noun  (on-poke-noun !<(* vase))
   ==
   ++  on-poke-noun
     |=  a=*
-    ~&  >>>  ;;(@tas -.a)
     ?:  ?=([%ui *] a)     (handle-ui a)
     ?:  ?=([%cache *] a)  (handle-cache +.a)
     ?:  ?=(%test a)   test
@@ -57,8 +60,9 @@
     ?:  ?=([%ban @p ?] a)     (handle-ban +.a)
     ?:  ?=([%del-ted @t] a)   (handle-del .y +.a)
     ?:  ?=([%del-com @t] a)   (handle-del .n +.a)
+    ?:  ?=([%auth @p @uv] a)  (handle-auth +.a)
     ~&  >>>  wtf=a
-    `this
+    [~ this]
   ++  handle-del
     |=  [is-ted=? uidt=@t]
     =/  uid  (slaw:sr %uw uidt)  ?~  uid  !!
@@ -75,7 +79,7 @@
       ?:  w
         (~(put in admins) ship)
       (~(del in admins) ship)
-    `this
+    [~ this]
   ++  handle-ban
     |=  [=ship w=?]
     ?>  (~(has in admins) src.bowl)
@@ -83,7 +87,7 @@
       ?:  w
         (~(put in blacklist) ship)
       (~(del in blacklist) ship)
-    `this
+    [~ this]
   ++  handle-cache
     |=  a=*
     :_  this
@@ -99,15 +103,25 @@
     ~&  'here'
     =^  cards  state  (handle-ui:cache noun)
     [cards this]
+  ::  MetaMask authentication successful.
+  ::  Normally called only via self-poke from 'POST'.
+  ++  handle-auth
+    |=  [who=@p =secret]
+    :: ^-  [(list card) _this]
+    :-  ~  ::this
+    %=  this
+      sessions    (~(put by sessions) who who)
+      challenges  (~(del in challenges) secret)
+    ==
   ++  test
     =/  teds  (tap:torm threads)
     ~&  teds=(lent teds)
     =/  coms  (tap:gorm:tp comments)
     ~&  coms=(lent coms)
-    `this
+    [~ this]
   ++  print
     ~&  >  state=state
-    `this
+    [~ this]
   ++  seed
     =/  rng  ~(. og eny.bowl)
     |%
@@ -211,19 +225,61 @@
     ^-  (quip card _this)
     =/  order  !<(order:router vase)
     =/  address  address.req.order
-    :_  this  (eyre:rout order)
+    ::  Provision MetaMask sessions if GET.
+    ?:  =(%'GET' method.request.req.order)
+      =?    sessions
+          !(~(has by sessions) src.bowl)
+        (~(put by sessions) [src.bowl src.bowl])
+      =/  new-challenge  (sham [now eny]:bowl)
+      =?    challenges
+          =(src.bowl (~(got by sessions) src.bowl))
+        (~(put in challenges) new-challenge)
+      [(eyre:rout order) this]
+    ::  Normal request.
+    [(eyre:rout order) this]
   --
 ++  on-peek   |=  =(pole knot)  ~
-++  on-agent  |=  [=wire =sign:agent:gall]  `this
-++  on-arvo   |=  [=(pole knot) =sign-arvo]  `this
+++  on-agent  |=  [=wire =sign:agent:gall]  [~ this]
+++  on-arvo
+  |=  [=(pole knot) =sign-arvo]
+  ^-  [(list card) _this]
+  ?+    sign-arvo  ~|([%strange-sign-arvo -.sign-arvo] !!)
+      [%behn %wake *]
+    ?+    pole  [~ this]
+        [%challenges ~]
+      ~&  >  '%ustj: %behn clear challenges'
+      :-  :~  (wait:hd pole now.bowl interval:const)
+          ==
+      this(challenges *(set secret))
+    ==
+    ::
+      [%eyre %bound *]
+    ~&  >  '%ustj: %eyre bound /forum'
+    [~ this]
+  ==
+++  on-fail   |~(* [~ this])
 --
 ::  helper
 |_  [s=versioned-state =bowl:gall]
-++  root-path-card  ^-  card
+++  root-path-card
+  ^-  card
   [%pass /root %arvo %e %connect [~ /forum] dap.bowl]
-++  init-cards  ^-  (list card)
-:~  root-path-card
-==
-++  schedule-backup-card  ^-  card
+++  init-cards
+  ^-  (list card)
+  :~  root-path-card
+      schedule-challenge-clear-card
+  ==
+++  schedule-backup-card
+  ^-  card
   [%pass /backup %arvo %b %wait (add now.bowl ~h6)]
+++  schedule-secret-retirement
+  ^-  card
+  [%pass /retire %arvo %b %wait (add now.bowl ~m15)]
+++  schedule-challenge-clear-card
+  ^-  card
+  (wait /challenges now.bowl interval:const)
+++  wait
+  |=  [=path now=@da time=@dr]
+  ^-  card
+  [%pass [%timer path] %arvo %b %wait (add now time)]
 --

@@ -8,6 +8,7 @@
       [%submit-thread title=@t url=@t text=@t]
       [%vote ted=? =pid:tp vote=?]
       [%del ted=? =pid:tp]
+      :: [%auth who=@p =secret adr=tape sig=tape]
   ==
 ::
 +$  state
@@ -23,8 +24,20 @@
       mods=(set @p)
       admins=(set @p)
       blacklist=(set @p)
+      ::
+      sessions=(map comet=@p id=@p)
+      =challenges
   ==
 ::
++$  secret      @uv
++$  challenges  (set secret)
++$  authorization
+  $:  %auth
+      who=@p
+      =secret
+      adr=tape
+      sig=tape
+  ==
 +$  threads  ((mop pid:tp thread) ggth:tp)
 ++  torm     ((on pid:tp thread) ggth:tp)
 +$  pfeed    ((mop sd pid:tp) cmp)
