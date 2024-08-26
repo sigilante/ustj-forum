@@ -2,6 +2,8 @@
 
 Created by ~polwex for the Urbit Foundation.
 
+Using MetaMask code by ~rabsef-bicrym adapted by [~hanfel-dovned](https://hanfel-dovned.startram.io/scratch/view/maskauff).
+
 ##  Command-Line Interface
 
 ```hoon
@@ -20,3 +22,4 @@ Created by ~polwex for the Urbit Foundation.
   - script has access to challenge
 - make sure to check sessions as appropriate
 - time out challenges after 15 minutes
+- Add “Hosted on Urbit” at bottom of page.

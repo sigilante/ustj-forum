@@ -11,6 +11,11 @@
       [%auth who=@p secret=@uv adr=tape sig=tape]
   ==
 ::
++$  card  card:agent:gall
++$  versioned-state
+  $%  state-0
+      state-1
+  ==
 +$  state
   $%  state-1
   ==

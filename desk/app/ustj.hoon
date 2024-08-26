@@ -1,19 +1,11 @@
 /-  *forum
 /+  dbug,
-    default-agent,
     sr=sortug,
     lib=forum,
     const=constants,
     seeds,
     cacher
 /=  router     /web/router
-|%
-++  card  card:agent:gall
-+$  versioned-state
-  $%  state-0
-      state-1
-  ==
---
 ::  main agent core
 %-  agent:dbug
 =|  state-1
@@ -23,46 +15,44 @@
 ::
 |_  =bowl:gall
 +*  this       .
-    default  ~(. (default-agent this %|) bowl)
     hd       ~(. +> [state bowl])
     rout     ~(. router:router [state bowl])
     cache    ~(. cacher [state bowl])
-++  on-fail   on-fail:default
-++  on-leave  on-leave:default
 ++  on-save   !>(state)
 ++  on-init
-  ^-  (quip card _this)
-  :_  this  init-cards:hd
+  ^-  [(list card) _this]
+  :-  init-cards:hd
+  this(admins admins:const)
 ++  on-load
   |=  =vase
   =/  old  !<(versioned-state vase)
   ?-    -.old
       %0
     %=  this
-      state  $:  %1
-                 threads.old
-                 popular.old
-                 comments.old
-                 karma.old
-                 mods.old
-                 admins.old
-                 blacklist.old
-                 sessions=~
-                 challenges=~
-             ==
-    ==
+      state   $:  %1
+                  threads.old
+                  popular.old
+                  comments.old
+                  karma.old
+                  mods.old
+                  admins.old
+                  blacklist.old
+                  sessions=~
+                  challenges=~
+    ==        ==
+    ::
       %1
     this(state old)
   ==
 ++  on-watch
   |=  =(pole knot)
   ?+  pole  !!
-    [%http-response id=@ ~]    `this
+    [%http-response id=@ ~]    [*(list card) this]
   ==
 ++  on-poke
   |=  [=mark =vase]
   |^
-  ?+  mark  `this
+  ?+  mark  [*(list card) this]
     %handle-http-request  serve
     %noun  (on-poke-noun !<(* vase))
   ==
@@ -81,7 +71,7 @@
     ?:  ?=([%del-ted @t] a)   (handle-del .y +.a)
     ?:  ?=([%del-com @t] a)   (handle-del .n +.a)
     ~&  >>>  wtf=a
-    `this
+    [*(list card) this]
   ++  handle-del
     |=  [is-ted=? uidt=@t]
     =/  uid  (slaw:sr %uw uidt)  ?~  uid  !!
@@ -98,7 +88,7 @@
       ?:  w
         (~(put in admins) ship)
       (~(del in admins) ship)
-    `this
+    [*(list card) this]
   ++  handle-ban
     |=  [=ship w=?]
     ?>  (~(has in admins) src.bowl)
@@ -106,7 +96,7 @@
       ?:  w
         (~(put in blacklist) ship)
       (~(del in blacklist) ship)
-    `this
+    [*(list card) this]
   ++  handle-cache
     |=  a=*
     :_  this
@@ -126,10 +116,10 @@
     ~&  teds=(lent teds)
     =/  coms  (tap:gorm:tp comments)
     ~&  coms=(lent coms)
-    `this
+    [*(list card) this]
   ++  print
     ~&  >  state=state
-    `this
+    [*(list card) this]
   ++  seed
     =/  rng  ~(. og eny.bowl)
     |%
@@ -230,14 +220,17 @@
     --
   ::
   ++  serve
-    ^-  (quip card _this)
+    ^-  [(list card) _this]
     =/  order  !<(order:router vase)
     =/  address  address.req.order
-    :_  this  (eyre:rout order)
+    :-  (eyre:rout order)
+    this
   --
-++  on-peek   |=  =(pole knot)  ~
-++  on-agent  |=  [=wire =sign:agent:gall]  `this
-++  on-arvo   |=  [=(pole knot) =sign-arvo]  `this
+++  on-agent  |=  [=wire =sign:agent:gall]  [~ this]
+++  on-arvo   |=  [=(pole knot) =sign-arvo]  [~ this]
+++  on-fail   |=  [=term =tang]  [~ this]
+++  on-leave  |=  =(pole knot)  `this ::`(quip card:agent:gall _this)`[*(list card:agent:gall) this]
+++  on-peek   |=  =(pole knot)  *(unit (unit cage))
 --
 ::  helper
 |_  [s=versioned-state =bowl:gall]
