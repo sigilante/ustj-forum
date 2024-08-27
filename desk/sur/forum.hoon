@@ -27,6 +27,7 @@
       ::
       sessions=(map comet=@p id=@p)
       =challenges
+      last-challenge=(unit secret)
   ==
 ::
 +$  secret      @uv

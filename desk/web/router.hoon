@@ -48,12 +48,30 @@
     |^
     :: if file extension assume its asset
     ?.  ?=(~ ext.rl)     (eyre-give (serve-assets rl))
+    ~&  >>  fpath
+    ~&  >>  url.request.req.order
     ?+    fpath  bail
         [%'GET' rest=*]
-      (eyre-manx (serve-get rl(site rest.fpath)))
+      ::  special-case MetaMask auth handling
+      ?.  =('/metamask' url.request.req.order)
+        (eyre-manx (serve-get rl(site rest.fpath)))
+      %+  give-simple-payload:app:server
+        id.order
+      ^-  simple-payload:http
+      :-  :-  200
+          ~[['Content-Type' 'application/json']]
+      `(as-octs:mimes:html (en:json:html (enjs-challenge state)))
       ::
         [%'POST' rest=*]
-      (serve-post id.order rl(site rest.fpath) body.request.req.order)
+      ::  special-case MetaMask auth handling
+      :: ?.  =('/auth' url.request.req.order)
+        (serve-post id.order rl(site rest.fpath) body.request.req.order)
+      :: %+  give-simple-payload:app:server
+      ::   id.order
+      :: ^-  simple-payload:http
+      :: :-  :-  200
+      ::     ~[['Content-Type' 'application/json']]
+      :: `(as-octs:mimes:html (en:json:html (enjs-state state)))
     ==
     ::
     ++  bail  (eyre-give pbail)
@@ -80,7 +98,7 @@
       (serve-assets rl)
     %-  manx-payload
     ^-  manx
-    ?+  pole  manx-bail
+    ?+    pole  manx-bail
       [%'GET' rest=*]    (serve-get rl(site rest.pole))
       :: [%'POST' rest=*]   (serve-post rl(site rest.pole))
     ==
@@ -109,7 +127,7 @@
       [%rep uid=@t ~]  (reply-page uid.p)
       [%usr p=@t ~]    (serve-user p.p)
       [%add ~]         (add-thread bowl)
-      [%log ~]         login-page
+      [%log ~]         (login-page state)
     ==
   ++  add-layout
     |=  m=manx
@@ -183,10 +201,13 @@
       ::  admin
       [%del-ted uid=@t ~]  (del .y uid.p)
       [%del-com uid=@t ~]  (del .n uid.p)
-      ::
-        [%auth *]
+      ::  metamask auth request?
+        ~
       ?~  body  ~|(%empty-auth-request !!)
+      ?.  =('auth' (cut 3 [0 4] q.u.body))
+        *(list card:agent:gall)
       =/  jon  (de:json:html q.u.body)
+      ~&  >>  jon
       ?~  jon  ~|(%empty-auth-json !!)
       (handle-auth u.jon)
     ==
@@ -303,6 +324,14 @@
         ==
       --
     --
+  ::
+  ++  enjs-challenge
+    =,  enjs:format
+    |=  [=state:sur]
+    ^-  json
+    %-  pairs
+    :~  [%challenge [%s (scot %uv ?~(last-challenge.state %$ u.last-challenge.state))]]
+    ==
   ::
   ++  self-poke
     |=  noun=*

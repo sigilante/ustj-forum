@@ -41,7 +41,6 @@
 ++  on-poke
   |=  [=mark =vase]
   |^
-  ~&  >  mark
   ?+  mark  [~ this]
     %handle-http-request  serve
     %noun  (on-poke-noun !<(* vase))
@@ -100,18 +99,18 @@
     ==
   ++  handle-ui
     |=  noun=*
-    ~&  'here'
     =^  cards  state  (handle-ui:cache noun)
     [cards this]
   ::  MetaMask authentication successful.
   ::  Normally called only via self-poke from 'POST'.
   ++  handle-auth
     |=  [who=@p =secret]
-    :: ^-  [(list card) _this]
-    :-  ~  ::this
+    ^-  [(list card) _this]
+    :-  ~
     %=  this
       sessions    (~(put by sessions) who who)
       challenges  (~(del in challenges) secret)
+      last-challenge  ?:(=(last-challenge `secret) ~ last-challenge)
     ==
   ++  test
     =/  teds  (tap:torm threads)
@@ -225,12 +224,15 @@
     ^-  (quip card _this)
     =/  order  !<(order:router vase)
     =/  address  address.req.order
-    ::  Provision MetaMask sessions if GET.
-    ?:  =(%'GET' method.request.req.order)
+    ::  Provision MetaMask sessions.
+    ?:  ?&  =(%'GET' method.request.req.order)
+            =(%'/metamask' url.request.req.order)
+        ==
       =?    sessions
           !(~(has by sessions) src.bowl)
         (~(put by sessions) [src.bowl src.bowl])
       =/  new-challenge  (sham [now eny]:bowl)
+      =.  last-challenge  `new-challenge
       =?    challenges
           =(src.bowl (~(got by sessions) src.bowl))
         (~(put in challenges) new-challenge)
@@ -254,7 +256,7 @@
     ==
     ::
       [%eyre %bound *]
-    ~&  >  '%ustj: %eyre bound /forum'
+    ~&  >  '%ustj: %eyre bound endpoints'
     [~ this]
   ==
 ++  on-fail   |~(* [~ this])
@@ -264,9 +266,17 @@
 ++  root-path-card
   ^-  card
   [%pass /root %arvo %e %connect [~ /forum] dap.bowl]
+++  metamask-card
+  ^-  card
+  [%pass /root %arvo %e %connect [~ /metamask] dap.bowl]
+++  auth-card
+  ^-  card
+  [%pass /root %arvo %e %connect [~ /auth] dap.bowl]
 ++  init-cards
   ^-  (list card)
   :~  root-path-card
+      metamask-card
+      auth-card
       schedule-challenge-clear-card
   ==
 ++  schedule-backup-card

@@ -149,6 +149,8 @@
   ^-  (list card)
   :~  (cache-card "/log")
       (cache-card "/add")
+      :: (cache-card "/auth")
+      :: (cache-card "/metamask")
       (cache-card "/style.css")
       (cache-card "/imgs/favicon.ico")
       (cache-card "/imgs/favicon-16x16.png")
