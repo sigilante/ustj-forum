@@ -19,7 +19,7 @@
       ;input(type "hidden", name "redirect", value redirect-str);
       ;button(name "eauth", type "submit"):"Login via Ship »"
     ==
-    ;form#form(id "metamaskLogin")
+    ;form(id "metamaskLogin")
       ;h2.tc: Urbit ID (MetaMask)
       ;input.mono(type "text")
         =name  "metamask"
@@ -29,6 +29,7 @@
         =minlength  "4"
         =maxlength  "14"
         =pattern    "~((([a-z]\{6})\{1,2}-\{0,2})+|[a-z]\{3})";
+      ;input(type "hidden", name "redirect", value redirect-str);
       ;button(name "mauth", type "submit"):"Login via 🦊MetaMask »"
       ;script:"{metamask-script}"
     ==

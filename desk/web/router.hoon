@@ -45,11 +45,10 @@
     =.  site.rl  ?~  site.rl  ~  t.site.rl
     =/  met  method.request.req.order
     =/  fpath=(pole knot)  [met site.rl]
+    ~&  >  [-.fpath url.request.req.order]
     |^
     :: if file extension assume its asset
     ?.  ?=(~ ext.rl)     (eyre-give (serve-assets rl))
-    ~&  >>  fpath
-    ~&  >>  url.request.req.order
     ?+    fpath  bail
         [%'GET' rest=*]
       ::  special-case MetaMask auth handling
@@ -63,15 +62,7 @@
       `(as-octs:mimes:html (en:json:html (enjs-challenge state)))
       ::
         [%'POST' rest=*]
-      ::  special-case MetaMask auth handling
-      :: ?.  =('/auth' url.request.req.order)
-        (serve-post id.order rl(site rest.fpath) body.request.req.order)
-      :: %+  give-simple-payload:app:server
-      ::   id.order
-      :: ^-  simple-payload:http
-      :: :-  :-  200
-      ::     ~[['Content-Type' 'application/json']]
-      :: `(as-octs:mimes:html (en:json:html (enjs-state state)))
+      (serve-post id.order rl(site rest.fpath) body.request.req.order)
     ==
     ::
     ++  bail  (eyre-give pbail)
@@ -204,10 +195,9 @@
       ::  metamask auth request?
         ~
       ?~  body  ~|(%empty-auth-request !!)
-      ?.  =('auth' (cut 3 [0 4] q.u.body))
-        *(list card:agent:gall)
+      :: ?.  =('auth' (cut 3 [0 4] q.u.body))
+      ::   *(list card:agent:gall)
       =/  jon  (de:json:html q.u.body)
-      ~&  >>  jon
       ?~  jon  ~|(%empty-auth-json !!)
       (handle-auth u.jon)
     ==
@@ -260,7 +250,9 @@
       ^-  (list card:agent:gall)
       |^
       =/  axn  (dejs-action body)
+      ~&  >  %here
       ?>  (validate who.axn secret.axn adr.axn sig.axn)
+      ~&  >  %here2
       (self-poke [%ui %auth who.axn secret.axn])
       ++  validate
         |=  [who=@p challenge=secret:sur address=tape hancock=tape]

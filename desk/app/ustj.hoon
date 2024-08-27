@@ -106,7 +106,8 @@
   ++  handle-auth
     |=  [who=@p =secret]
     ^-  [(list card) _this]
-    :-  ~
+    ~&  >  %handle-auth-self-poke
+    :-  ~[cache-root:cache]
     %=  this
       sessions    (~(put by sessions) who who)
       challenges  (~(del in challenges) secret)

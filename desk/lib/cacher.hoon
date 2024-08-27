@@ -11,9 +11,7 @@
 +$  card  card:agent:gall
 ++  handle-ui
   |=  noun=*  ^-  [(list card) _state]
-  ~&  >>  'here2'
   =/  poke  (pokes:sur noun)
-  ~&  >>  ui-poke=poke
   =.  src  ship.poke
   =/  eyre-id  eyre-id.poke
   |^
@@ -27,11 +25,8 @@
   ++  handle-thread
     |=  [title=@t url=@t text=@t]
     =/  =content:sur  ?.  .=('' url)  [%link url]  [%text (build-content:lib text)]
-    ~&  >  [title url text]
     =/  ted  (build-thread:lib title src now content)
-    ~&  >>  ted
     =.  state  (save-ted ted)
-    ~&  >>>  'here3'
     :_  state  :+
         cache-root
       (cache-ted pid.ted)
@@ -62,7 +57,6 @@
     ==
   ++  handle-vote
     |=  [is-ted=? =pid:tp vote=?]
-    ~&  >  handling-vote=[is-ted pid vote]
     ?:  is-ted
       (handle-ted-vote pid vote)
     (handle-com-vote pid vote)
