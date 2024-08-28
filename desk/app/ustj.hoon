@@ -47,7 +47,6 @@
   ==
   ++  on-poke-noun
     |=  a=*
-    ~&  ;;(@tas -.a)
     ?:  ?=([%ui *] a)     (handle-ui a)
     ?:  ?=([%cache *] a)  (handle-cache +.a)
     ?:  ?=(%test a)   test
@@ -115,9 +114,7 @@
     ==
   ++  test
     =/  teds  (tap:torm threads)
-    ~&  teds=(lent teds)
     =/  coms  (tap:gorm:tp comments)
-    ~&  coms=(lent coms)
     [~ this]
   ++  print
     ~&  >  state=state

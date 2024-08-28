@@ -45,7 +45,6 @@
     =.  site.rl  ?~  site.rl  ~  t.site.rl
     =/  met  method.request.req.order
     =/  fpath=(pole knot)  [met site.rl]
-    ~&  >  [-.fpath url.request.req.order]
     |^
     :: if file extension assume its asset
     ?.  ?=(~ ext.rl)     (eyre-give (serve-assets rl))
@@ -95,7 +94,6 @@
     ==
   ++  serve-assets
     |=  rl=request-line:server
-    :: ~&  >>  assets=rl
     ?+  [site ext]:rl  pbail
       [[%style ~] [~ %css]]  (css-response:gen:server (as-octs:mimes:html css))
       :: [[%spinner ~] [~ %svg]]   [%full (serve-other:kaji %svg spinner)]
@@ -224,7 +222,6 @@
     ++  handle-thread
       ?~  body  ~
       =/  bod  (frisk:rd q.u.body)
-      ~&  bod=bod
       =/  md  (~(get by bod) 'text')  ?~  md  ~
       =/  title  (~(get by bod) 'title')  ?~  title  ~
       =/  url  (~(get by bod) 'url')  ?~  url  ~
@@ -249,11 +246,8 @@
       |=  [body=json]
       ^-  (list card:agent:gall)
       |^
-      ~&  >  %here
       =/  axn  (dejs-action body)
-      ~&  >  [%iere who.axn]
       ?>  (validate who.axn secret.axn adr.axn sig.axn)
-      ~&  >  [%jere src.bowl]
       (self-poke [%auth who.axn src.bowl secret.axn])
       ++  validate
         |=  [who=@p challenge=secret:sur address=tape hancock=tape]
