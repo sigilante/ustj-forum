@@ -24,7 +24,7 @@ Created by ~polwex for the Urbit Foundation.
 ## TODOs ahead of launch
 
 - [ ] fix CSS/layout to perfectly match main site
-- [ ] fix HTTPS on host ship
+- [x] fix HTTPS on host ship
 - [ ] redirect from MetaMask login to main forum page when logged in
 - [ ] fix 404 on top parent of comment (should return to thread)
 - [ ] add “Hosted on Urbit” to footer (`/web/layout.hoon`)
