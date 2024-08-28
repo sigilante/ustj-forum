@@ -150,11 +150,12 @@
     (index [u.pag threads] state bowl)
   ++  serve-comment
     |=  uidt=@t
+    ~&  >>  serving-comment=uidt
     ^-  manx
     =/  uid  (slaw:sr %uw uidt)  ?~  uid  manx-bail
     =/  cued  (cue u.uid)
     =/  pid  ((soft pid:tp) cued)  ?~  pid  manx-bail
-    =/  com  (get-comment:lib u.pid state)  ?~  com  manx-bail
+    =/  com  (get-comment:lib u.pid state)  ?~  com  (serve-thread uidt)
     =/  ted  (get-thread:lib thread.u.com state)  ?~  ted  manx-bail
     =/  fn  (node-to-full:lib u.com comments.state)
     (comment-page u.ted fn bowl)
@@ -170,11 +171,15 @@
     (add-comment u.ted u.com bowl)
   ++  serve-thread
     |=  uidt=@t
+    ~&  >>  serving-thread=uidt
     ^-  manx
     =/  uid  (slaw:sr %uw uidt)  ?~  uid  manx-bail
     =/  cued  (cue u.uid)
     =/  pid  ((soft pid:tp) cued)  ?~  pid  manx-bail
-    =/  ted  (get-thread:lib u.pid state)  ?~  ted  manx-bail
+    ~&  >  pid=pid
+    =/  ted  (get-thread:lib u.pid state)  
+    ~&  ted=ted
+    ?~  ted  manx-bail
     =/  fg  (get-comment-list:lib u.ted comments.state)
     (thread u.ted fg bowl)
   ++  serve-post
