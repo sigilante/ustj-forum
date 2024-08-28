@@ -14,7 +14,11 @@
     ==
     ;body
       ;*  children
-      ;div.footer:"Hosted on Urbit."
+      ;div.footer
+        ; Hosted on 
+        ;a/"https://urbit.org/get-started": ~Urbit
+        ; .
+      ==
     ==
   ==
 --

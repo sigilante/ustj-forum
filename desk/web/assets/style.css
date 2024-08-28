@@ -143,9 +143,9 @@ a {
     align-items: center;
     text-decoration: underline;
     margin-right: 2rem;
-    font-size: 20px;
-    line-height: 23px;
-    font-weight: 600;
+    font-size: 18px;
+    line-height: 24.12px;
+    /* font-weight: 600; */
   }
 }
 
@@ -153,9 +153,9 @@ a {
   background-color: var(--black);
   color: var(--primary);
   cursor: pointer;
-  font-size: 24px;
-  line-height: 30px;
-  font-weight: 600;
+  font-size: 18px;
+  line-height: 24.12px;
+  /* font-weight: 600; */
   text-align: center;
   display: flex;
   align-items: center;
@@ -166,9 +166,9 @@ a {
 #nav-links {
   display: flex;
   align-items: center;
-  font-size: 24px;
-  line-height: 30px;
-  font-weight: 600;
+  font-size: 18px;
+  line-height: 24.12px;
+  /* font-weight: 600; */
   text-align: center;
   gap: 1rem;
 
@@ -398,11 +398,18 @@ button, .button{
 }
 
 .footer {
-  position: fixed;
+  /* height: 63px; */
+  /* display: flex; */
+  /* position: fixed; */
   left: 0;
   bottom: 0;
-  width: 100%;
+  /* width: 100%; */
   background-color: none;
+  padding: 0.5rem;
   color: #141A14;
   text-align: right;
+  margin-right: 2rem;
+  font-size: 20px;
+  line-height: 23px;
+  font-weight: 600;
 }

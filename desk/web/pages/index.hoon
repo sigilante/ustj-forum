@@ -18,7 +18,6 @@
   ^-  marl
   =/  tl  threads.thp
   =/  page  -.thp
-  ~&  page=page
   =/  init  (mul (dec -.thp) page-size:cons)
   =/  i  +(init)
   =|  res=marl

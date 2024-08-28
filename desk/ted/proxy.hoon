@@ -21,7 +21,6 @@
           (retry p.r +(count))
     ==
   ++  send-req  |=  url=@t  
-  ~&  fetching=url
   =/  m  (strand ,res-t)  ^-  form:m
   =/  headers
   :~
@@ -40,7 +39,6 @@
   ?.  ?=(%finished -.res)  (strand-fail:strand %no-body ~)
   =/  headers  headers.response-header.res  
   =/  redirect  (get-header:http 'location' headers)
-    ~&  >>  red=redirect
     ?^  redirect  (pure:m [%| u.redirect])  
 
   ::

@@ -106,7 +106,7 @@
   ++  handle-auth
     |=  [who=@p src=@p =secret]
     ^-  [(list card) _this]
-    ~&  >>  "Successful authentication of {<src>} as {<who>}."
+    ~&  >  "%ustj: Successful authentication of {<src>} as {<who>}."
     :-  ~[cache-root:cache]
     %=  this
       sessions        (~(put by sessions) src who)

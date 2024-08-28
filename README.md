@@ -1,11 +1,13 @@
 # Urbit Systems Technical Journal Forum
 
-Created by ~polwex for the Urbit Foundation.
+Created by ~polwex for the [Urbit Foundation](https://urbit.org).
 
 ##  Command-Line Interface
 
 ```hoon
-> :ustj [%ui ~zod *@ta %submit-thread title='Google Dot Com' url='http://google.com' text='']
+> :ustj|add-link ~rovnys-ricfer 'USTJv1i1 - Eight Years After the Whitepaper' 'https://urbitsystems.tech/article/v01-i01/eight-years-after-the-whitepaper'
+
+:ustj|add-text ~lagrev-nocfep 'The Forum Rules' '1. Be civil. No swearing or vulgarity. This is a professional forum.\0a2. Discussion trend technical and should engage on the merits. No _ad hominem_ or other fallacious reasoning permitted.\0a3. No spamming, brigading, DDOSing, etc. Keep things running smoothly and keep the conversation legible.\0a\0aWe reserve the right to update these rules should behavior merit it.\0a\0aPlease report any bugs to ~lagrev-nocfep on the network.'
 
 > :ustj [%ui ~rovnys-ricfer *@ta %submit-thread title='USTJv1i1 - Eight Years After the Whitepaper' url='https://urbitsystems.tech/article/v01-i01/eight-years-after-the-whitepaper' text='']
 
@@ -23,10 +25,10 @@ Created by ~polwex for the Urbit Foundation.
 
 ## TODOs ahead of launch
 
-- [ ] fix CSS/layout to perfectly match main site
+- [~] fix CSS/layout to perfectly match main site
 - [x] fix HTTPS on host ship
-- [ ] redirect from MetaMask login to main forum page when logged in
+- [~] redirect from MetaMask login to main forum page when logged in
 - [ ] fix 404 on top parent of comment (should return to thread)
-- [ ] add “Hosted on Urbit” to footer (`/web/layout.hoon`)
-- [ ] implement CLI generators for pokes
-- [ ] link from main site
+- [x] add “Hosted on Urbit” to footer (`/web/layout.hoon`)
+- [x] implement CLI generators for pokes
+- [x] link from main site

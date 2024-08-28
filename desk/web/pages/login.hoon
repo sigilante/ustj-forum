@@ -32,10 +32,18 @@
       ;input(type "hidden", name "redirect", value redirect-str);
       ;button(name "mauth", type "submit"):"Login via 🦊MetaMask »"
       ;script:"{metamask-script}"
+      ;div.tc.nudge
+        ;p
+          ; After successful Metamask login, click through to the
+          ;a/"https://journal.urbitsystems.tech/forum": USTJ Forum
+          ; .
+        ==
+      ==
     ==
+    ;h2.tc: Join the Urbit Network
     ;div.tc.nudge
-      ;p:"If you don't have an Urbit ID, click on this link to get one for free."
       ;a.button/"https://redhorizon.com/join/2d55b768-a5f4-45cf-a4e5-a4302e05a1f9":"Get Urbit ID »"
+      ;p:"If you don't have an Urbit ID, get one for free from Red Horizon."
     ==
   ==
 ++  metamask-script
@@ -89,7 +97,8 @@
                 });
 
                 if (response.ok) {
-                    location.reload();
+                    // location.reload();
+                    window.location.replace('/forum');
                 } else {
                     alert("Login failed. Please try again.");
                 }
