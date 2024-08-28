@@ -396,3 +396,13 @@ button, .button{
   padding: 0.5rem;
   width: max-content;
 }
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: none;
+  color: #141A14;
+  text-align: right;
+}

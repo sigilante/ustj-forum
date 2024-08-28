@@ -8,7 +8,6 @@
       [%submit-thread title=@t url=@t text=@t]
       [%vote ted=? =pid:tp vote=?]
       [%del ted=? =pid:tp]
-      :: [%auth who=@p =secret adr=tape sig=tape]
   ==
 ::
 +$  state

@@ -21,5 +21,9 @@ Created by ~polwex for the Urbit Foundation.
 
 ---
 
-- [ ] getting MetaMask script to kick off
-- [ ] add “Hosted on Urbit” to footer
+## TODOs ahead of launch
+
+- [ ] redirect from MetaMask login to main forum page when logged in
+- [ ] fix 404 on top parent of comment (should return to thread)
+- [ ] add “Hosted on Urbit” to footer (`/web/layout.hoon`)
+- [ ] improve CLI generators

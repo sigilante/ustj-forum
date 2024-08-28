@@ -20,7 +20,7 @@
   ;a/"/forum/log":"Log In"
 ++  new-post-link
   ^-  marl
-  ?:  (~(has in admins.state) src.bowl)  ~
+  ?.  (~(has in admins.state) src.bowl)  ~
   ;+  ;a/"/forum/add":"new post"
 ++  sigil
   :: ;+  (sig(size 48) src.bowl)

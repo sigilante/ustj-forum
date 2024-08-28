@@ -14,6 +14,7 @@
     ==
     ;body
       ;*  children
+      ;div.footer:"Hosted on Urbit."
     ==
   ==
 --
