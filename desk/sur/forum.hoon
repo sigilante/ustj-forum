@@ -23,8 +23,20 @@
       mods=(set @p)
       admins=(set @p)
       blacklist=(set @p)
+      ::
+      sessions=(map comet=@p id=@p)
+      =challenges
+      last-challenge=(unit secret)
   ==
 ::
++$  secret      @uv
++$  challenges  (set secret)
++$  authorization
+  $:  who=@p
+      =secret
+      adr=tape
+      sig=tape
+  ==
 +$  threads  ((mop pid:tp thread) ggth:tp)
 ++  torm     ((on pid:tp thread) ggth:tp)
 +$  pfeed    ((mop sd pid:tp) cmp)

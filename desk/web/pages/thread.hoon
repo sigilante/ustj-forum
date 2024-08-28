@@ -5,7 +5,7 @@
 |_  [ted=thread:sur comment-list=(list full-node:tp) =bowl:gall]
 ++  body
   ?:  ?=(%link -.content.ted)
-  ;+  link-body
+    ;+  link-body
   (content:pt +.content.ted)
 ++  link-body
   ?>  ?=(%link -.content.ted)

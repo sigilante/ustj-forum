@@ -1,5 +1,6 @@
 /-  sur=forum, tp=post
-/+  lib=forum, sr=sortug, rd=rudder, cons=constants
+/+  lib=forum, sr=sortug, rd=rudder, cons=constants,
+    naive, ethereum
 /+  server
 ::  pages and components
 /=  layout        /web/layout
@@ -49,7 +50,15 @@
     ?.  ?=(~ ext.rl)     (eyre-give (serve-assets rl))
     ?+    fpath  bail
         [%'GET' rest=*]
-      (eyre-manx (serve-get rl(site rest.fpath)))
+      ::  special-case MetaMask auth handling
+      ?.  =('/metamask' url.request.req.order)
+        (eyre-manx (serve-get rl(site rest.fpath)))
+      %+  give-simple-payload:app:server
+        id.order
+      ^-  simple-payload:http
+      :-  :-  200
+          ~[['Content-Type' 'application/json']]
+      `(as-octs:mimes:html (en:json:html (enjs-challenge state)))
       ::
         [%'POST' rest=*]
       (serve-post id.order rl(site rest.fpath) body.request.req.order)
@@ -79,13 +88,12 @@
       (serve-assets rl)
     %-  manx-payload
     ^-  manx
-    ?+  pole  manx-bail
+    ?+    pole  manx-bail
       [%'GET' rest=*]    (serve-get rl(site rest.pole))
       :: [%'POST' rest=*]   (serve-post rl(site rest.pole))
     ==
   ++  serve-assets
     |=  rl=request-line:server
-    :: ~&  >>  assets=rl
     ?+  [site ext]:rl  pbail
       [[%style ~] [~ %css]]  (css-response:gen:server (as-octs:mimes:html css))
       :: [[%spinner ~] [~ %svg]]   [%full (serve-other:kaji %svg spinner)]
@@ -96,6 +104,7 @@
     |=  rl=request-line:server
     ^-  manx
     =/  p=(pole knot)  site.rl
+    ::
     ?:  ?=([%f rest=*] p)  (serve-fragment rest.p)
     %-  add-layout
     ?+  p  manx-bail
@@ -107,7 +116,7 @@
       [%rep uid=@t ~]  (reply-page uid.p)
       [%usr p=@t ~]    (serve-user p.p)
       [%add ~]         (add-thread bowl)
-      [%log ~]         login-page
+      [%log ~]         (login-page state)
     ==
   ++  add-layout
     |=  m=manx
@@ -181,6 +190,14 @@
       ::  admin
       [%del-ted uid=@t ~]  (del .y uid.p)
       [%del-com uid=@t ~]  (del .n uid.p)
+      ::  metamask auth request?
+        ~
+      ?~  body  ~|(%empty-auth-request !!)
+      :: ?.  =('auth' (cut 3 [0 4] q.u.body))
+      ::   *(list card:agent:gall)
+      =/  jon  (de:json:html q.u.body)
+      ?~  jon  ~|(%empty-auth-json !!)
+      (handle-auth u.jon)
     ==
     ++  del
       |=  [is-ted=? uidt=@t]
@@ -191,25 +208,24 @@
       ?:  is-ted
         =/  ted  (get-thread:lib u.pid state)
         ?~  ted  ~
-        (self-poke [%ui src.bowl eyre-id %del is-ted u.ted])
+        (self-poke [%ui (~(got by sessions.state) src.bowl) eyre-id %del is-ted u.ted])
       =/  com  (get-comment:lib u.pid state)
       ?~  com  ~
-      (self-poke [%ui src.bowl eyre-id %del is-ted u.com])
+      (self-poke [%ui (~(got by sessions.state) src.bowl) eyre-id %del is-ted u.com])
     ++  handle-vote
       |=  [is-ted=? uidt=@t vote=@t]
       =/  vot=?  .=(vote 'gud')
       =/  uid  (slaw:sr %uw uidt)  ?~  uid  ~
       =/  cued  (cue u.uid)
       =/  pid  %-  (soft pid:tp)  cued  ?~  pid  ~
-      (self-poke [%ui src.bowl eyre-id %vote is-ted u.pid vot])
+      (self-poke [%ui (~(got by sessions.state) src.bowl) eyre-id %vote is-ted u.pid vot])
     ++  handle-thread
       ?~  body  ~
       =/  bod  (frisk:rd q.u.body)
-      ~&  bod=bod
       =/  md  (~(get by bod) 'text')  ?~  md  ~
       =/  title  (~(get by bod) 'title')  ?~  title  ~
       =/  url  (~(get by bod) 'url')  ?~  url  ~
-      (self-poke [%ui src.bowl eyre-id %submit-thread u.title u.url u.md])
+      (self-poke [%ui (~(got by sessions.state) src.bowl) eyre-id %submit-thread u.title u.url u.md])
     ++  handle-reply
       |=  top=?
       ?~  body  ~
@@ -221,10 +237,91 @@
       =/  md  (~(get by bod) 'text')  ?~  md  ~
       ?:  top
         =/  ted  (get-thread:lib u.pid state)  ?~  ted  ~
-        (self-poke [%ui src.bowl eyre-id %submit-comment u.ted u.md])
+        (self-poke [%ui (~(got by sessions.state) src.bowl) eyre-id %submit-comment u.ted u.md])
       =/  com  (get-comment:lib u.pid state)  ?~  com  ~
-      (self-poke [%ui src.bowl eyre-id %submit-reply u.com u.md])
+      (self-poke [%ui (~(got by sessions.state) src.bowl) eyre-id %submit-reply u.com u.md])
+    ::  MetaMask authentication request; others go via EAuth.
+    ::  Modified from ~rabsef-bicrym's %mask by ~hanfel-dovned.
+    ++  handle-auth
+      |=  [body=json]
+      ^-  (list card:agent:gall)
+      |^
+      =/  axn  (dejs-action body)
+      ?>  (validate who.axn secret.axn adr.axn sig.axn)
+      (self-poke [%auth who.axn src.bowl secret.axn])
+      ++  validate
+        |=  [who=@p challenge=secret:sur address=tape hancock=tape]
+        ^-  ?
+        =/  addy  (from-tape address)
+        =/  cock  (from-tape hancock)
+        =/  owner  (get-owner who)  ?~  owner  %.n
+        ?.  =(addy u.owner)  %.n
+        ?.  (~(has in challenges.state) challenge)  %.n
+        =/  note=@uvI
+          =+  octs=(as-octs:mimes:html (scot %uv challenge))
+          %-  keccak-256:keccak:crypto
+          %-  as-octs:mimes:html
+          ;:  (cury cat 3)
+            '\19Ethereum Signed Message:\0a'
+            (crip (a-co:co p.octs))
+            q.octs
+          ==
+        ?.  &(=(20 (met 3 addy)) =(65 (met 3 cock)))  %.n
+        =/  r  (cut 3 [33 32] cock)
+        =/  s  (cut 3 [1 32] cock)
+        =/  v=@
+          =+  v=(cut 3 [0 1] cock)
+          ?+  v  !!
+            %0   0
+            %1   1
+            %27  0
+            %28  1
+          ==
+        ?.  |(=(0 v) =(1 v))  %.n
+        =/  xy
+          (ecdsa-raw-recover:secp256k1:secp:crypto note v r s)
+        =/  pub  :((cury cat 3) y.xy x.xy 0x4)
+        =/  add  (address-from-pub:key:ethereum pub)
+        =(addy add)
+      ::
+      ++  from-tape
+        |=(h=tape ^-(@ux (scan h ;~(pfix (jest '0x') hex))))
+      ::
+      ++  get-owner
+        |=  who=@p
+        ^-  (unit @ux)
+        =-  ?~  pin=`(unit point:naive)`-
+              ~
+            ?.  |(?=(%l1 dominion.u.pin) ?=(%l2 dominion.u.pin))
+              ~
+            `address.owner.own.u.pin
+        .^  (unit point:naive)
+          %gx
+          %+  en-beam
+            [our.bowl %azimuth [%da now.bowl]]
+          /point/(scot %p who)/noun
+        ==
+      ++  dejs-action
+        |=  jon=json
+        ^-  authorization:sur
+        =,  dejs:format
+        %.  jon
+        %-  ot
+        :~  [%who (se %p)]
+            [%secret (se %uv)]
+            [%address sa]
+            [%signature sa]
+        ==
+      --
     --
+  ::
+  ++  enjs-challenge
+    =,  enjs:format
+    |=  [=state:sur]
+    ^-  json
+    %-  pairs
+    :~  [%challenge [%s (scot %uv ?~(last-challenge.state %$ u.last-challenge.state))]]
+    ==
   ::
   ++  self-poke
     |=  noun=*
