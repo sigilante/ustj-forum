@@ -33,8 +33,7 @@
 +$  secret      @uv
 +$  challenges  (set secret)
 +$  authorization
-  $:  %auth
-      who=@p
+  $:  who=@p
       =secret
       adr=tape
       sig=tape

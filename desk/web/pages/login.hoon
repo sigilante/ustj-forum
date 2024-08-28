@@ -69,7 +69,6 @@
             try {
                 const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
                 const account = accounts[0];
-                console.log(account);
 
                 const signature = await window.ethereum.request({
                     method: "personal_sign",
@@ -88,7 +87,6 @@
                         signature: signature
                     }),
                 });
-                console.log(response);
 
                 if (response.ok) {
                     location.reload();

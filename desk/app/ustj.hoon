@@ -47,6 +47,7 @@
   ==
   ++  on-poke-noun
     |=  a=*
+    ~&  ;;(@tas -.a)
     ?:  ?=([%ui *] a)     (handle-ui a)
     ?:  ?=([%cache *] a)  (handle-cache +.a)
     ?:  ?=(%test a)   test
@@ -59,7 +60,7 @@
     ?:  ?=([%ban @p ?] a)     (handle-ban +.a)
     ?:  ?=([%del-ted @t] a)   (handle-del .y +.a)
     ?:  ?=([%del-com @t] a)   (handle-del .n +.a)
-    ?:  ?=([%auth @p @uv] a)  (handle-auth +.a)
+    ?:  ?=([%auth @p @p @uv] a)  (handle-auth +.a)
     ~&  >>>  wtf=a
     [~ this]
   ++  handle-del
@@ -104,13 +105,12 @@
   ::  MetaMask authentication successful.
   ::  Normally called only via self-poke from 'POST'.
   ++  handle-auth
-    |=  [who=@p =secret]
+    |=  [who=@p src=@p =secret]
     ^-  [(list card) _this]
-    ~&  >  %handle-auth-self-poke
     :-  ~[cache-root:cache]
     %=  this
-      sessions    (~(put by sessions) who who)
-      challenges  (~(del in challenges) secret)
+      sessions        (~(put by sessions) src who)
+      challenges      (~(del in challenges) secret)
       last-challenge  ?:(=(last-challenge `secret) ~ last-challenge)
     ==
   ++  test

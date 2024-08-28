@@ -4,12 +4,12 @@
 |_  [=state:sur =bowl:gall]
 ++  login
   ^-  manx
-  ?-  (clan:title src.bowl)
-  %czar  sigil
-  %king  sigil
-  %duke  sigil
-  %earl  sigil
-  %pawn  login-prompt
+  ?-  (clan:title (~(gut by sessions.state) src.bowl (dec (bex 128))))
+    %czar  sigil
+    %king  sigil
+    %duke  sigil
+    %earl  sigil
+    %pawn  login-prompt
   ==
 ++  get-id
   ^-  @p
@@ -23,12 +23,20 @@
   ?:  (~(has in admins.state) src.bowl)  ~
   ;+  ;a/"/forum/add":"new post"
 ++  sigil
-:: ;+  (sig(size 48) src.bowl)
-=/  p  (scow %p src.bowl)
-  ;div.f.g2
-    ;*  new-post-link
-    ;a/"/forum/usr/{p}":"{p}"
-  ==
+  :: ;+  (sig(size 48) src.bowl)
+  =/  =ship
+    ?+  (clan:title (~(gut by sessions.state) src.bowl (dec (bex 128))))
+        !!
+      %czar  ?:((gte (bex 64) src.bowl) src.bowl (~(got by sessions.state) src.bowl))
+      %king  ?:((gte (bex 64) src.bowl) src.bowl (~(got by sessions.state) src.bowl))
+      %duke  ?:((gte (bex 64) src.bowl) src.bowl (~(got by sessions.state) src.bowl))
+      %earl  ?:((gte (bex 64) src.bowl) src.bowl (~(got by sessions.state) src.bowl))
+    ==
+  =/  p  (scow %p ship)
+    ;div.f.g2
+      ;*  new-post-link
+      ;a/"/forum/usr/{p}":"{p}"
+    ==
 ++  $
   ;nav#topnav.fs.g2
     ;div.f.g2

@@ -249,11 +249,12 @@
       |=  [body=json]
       ^-  (list card:agent:gall)
       |^
-      =/  axn  (dejs-action body)
       ~&  >  %here
+      =/  axn  (dejs-action body)
+      ~&  >  [%iere who.axn]
       ?>  (validate who.axn secret.axn adr.axn sig.axn)
-      ~&  >  %here2
-      (self-poke [%ui %auth who.axn secret.axn])
+      ~&  >  [%jere src.bowl]
+      (self-poke [%auth who.axn src.bowl secret.axn])
       ++  validate
         |=  [who=@p challenge=secret:sur address=tape hancock=tape]
         ^-  ?
@@ -311,8 +312,11 @@
         ^-  authorization:sur
         =,  dejs:format
         %.  jon
-        %-  of
-        :~  [%auth (ot ~[who+(se %p) secret+(se %uv) address+sa signature+sa])]
+        %-  ot
+        :~  [%who (se %p)]
+            [%secret (se %uv)]
+            [%address sa]
+            [%signature sa]
         ==
       --
     --
