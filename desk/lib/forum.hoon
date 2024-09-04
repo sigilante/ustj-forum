@@ -186,4 +186,15 @@
   ?:  ?=(%tam length)   "mo"  " months"
                         %+  weld  (scow %ud (div diff ~d365))
   ?:  ?=(%tam length)   "y"  " years"
+
+++  is-pawn  |=  p=@p  ^-  ?
+  ?=  %pawn  (clan:title p)
+
+++  meta-login  |=  [=bowl:gall sessions=(map comet=@p id=@p)]  ^-  bowl:gall
+  =/  id=@p  
+    =/  session  (~(get by sessions) src.bowl)
+      ?~  session  src.bowl
+      u.session
+  =.  src.bowl  id
+  bowl
 --

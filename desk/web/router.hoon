@@ -49,17 +49,9 @@
     :: if file extension assume its asset
     ?.  ?=(~ ext.rl)     (eyre-give (serve-assets rl))
     ?+    fpath  bail
+        [%'GET' %metamask rest=*]  (handle-metamask order)
         [%'GET' rest=*]
-      ::  special-case MetaMask auth handling
-      ?.  =('/metamask' url.request.req.order)
-        (eyre-manx (serve-get rl(site rest.fpath)))
-      %+  give-simple-payload:app:server
-        id.order
-      ^-  simple-payload:http
-      :-  :-  200
-          ~[['Content-Type' 'application/json']]
-      `(as-octs:mimes:html (en:json:html (enjs-challenge state)))
-      ::
+      (eyre-manx (serve-get rl(site rest.fpath)))
         [%'POST' rest=*]
       (serve-post id.order rl(site rest.fpath) body.request.req.order)
     ==
@@ -150,7 +142,6 @@
     (index [u.pag threads] state bowl)
   ++  serve-comment
     |=  uidt=@t
-    ~&  >>  serving-comment=uidt
     ^-  manx
     =/  uid  (slaw:sr %uw uidt)  ?~  uid  manx-bail
     =/  cued  (cue u.uid)
@@ -171,17 +162,27 @@
     (add-comment u.ted u.com bowl)
   ++  serve-thread
     |=  uidt=@t
-    ~&  >>  serving-thread=uidt
     ^-  manx
     =/  uid  (slaw:sr %uw uidt)  ?~  uid  manx-bail
     =/  cued  (cue u.uid)
     =/  pid  ((soft pid:tp) cued)  ?~  pid  manx-bail
-    ~&  >  pid=pid
     =/  ted  (get-thread:lib u.pid state)  
-    ~&  ted=ted
     ?~  ted  manx-bail
     =/  fg  (get-comment-list:lib u.ted comments.state)
     (thread u.ted fg bowl)
+    ::
+    ++  handle-metamask  |=  =order
+      ::  special-case MetaMask auth handling
+      =/  new-challenge  (sham [now eny]:bowl)
+      %+  weld  (self-poke [%meta new-challenge])
+      %+  give-simple-payload:app:server
+        id.order
+      ^-  simple-payload:http
+      :-  :-  200
+          ~[['Content-Type' 'application/json']]
+      `(as-octs:mimes:html (en:json:html (enjs-challenge new-challenge)))
+      ::
+    
   ++  serve-post
     |=  [eyre-id=@ta rl=request-line:server body=(unit octs)]
     |^
@@ -196,13 +197,7 @@
       [%del-ted uid=@t ~]  (del .y uid.p)
       [%del-com uid=@t ~]  (del .n uid.p)
       ::  metamask auth request?
-        ~
-      ?~  body  ~|(%empty-auth-request !!)
-      :: ?.  =('auth' (cut 3 [0 4] q.u.body))
-      ::   *(list card:agent:gall)
-      =/  jon  (de:json:html q.u.body)
-      ?~  jon  ~|(%empty-auth-json !!)
-      (handle-auth u.jon)
+      [%auth ~]  (handle-auth eyre-id body)
     ==
     ++  del
       |=  [is-ted=? uidt=@t]
@@ -248,20 +243,43 @@
     ::  MetaMask authentication request; others go via EAuth.
     ::  Modified from ~rabsef-bicrym's %mask by ~hanfel-dovned.
     ++  handle-auth
-      |=  [body=json]
+      |=  [order-id=@t octs=(unit octs)]
       ^-  (list card:agent:gall)
       |^
+      ?~  octs  ~|(%empty-auth-request !!)
+      :: ?.  =('auth' (cut 3 [0 4] q.u.octs))
+      ::   *(list card:agent:gall)
+      =/  jon  (de:json:html q.u.octs)
+      ?~  jon  ~|(%empty-auth-json !!)
+      =/  body=json  u.jon
       =/  axn  (dejs-action body)
-      ?>  (validate who.axn secret.axn adr.axn sig.axn)
+      =/  is-valid  (validate who.axn secret.axn adr.axn sig.axn)
+      ~&  >>  signature-valid=[is-valid who.axn secret.axn adr.axn sig.axn]
+      ?.  is-valid  ~|(%bad-metamask-signature !!)
+      %+  weld
       (self-poke [%auth who.axn src.bowl secret.axn])
+      %+  give-simple-payload:app:server
+        order-id
+      ^-  simple-payload:http
+      :-  :-  200
+          ~[['Content-Type' 'application/json']]
+      =/  obj=json  %-  pairs:enjs:format  :~([%login-ok [%b .y]])
+      `(as-octs:mimes:html (en:json:html obj))
+      
       ++  validate
         |=  [who=@p challenge=secret:sur address=tape hancock=tape]
         ^-  ?
         =/  addy  (from-tape address)
         =/  cock  (from-tape hancock)
-        =/  owner  (get-owner who)  ?~  owner  %.n
-        ?.  =(addy u.owner)  %.n
-        ?.  (~(has in challenges.state) challenge)  %.n
+        =/  owner  (get-owner who)  ?~  owner  
+          ~&  "no owner"  
+          %.n
+        ?.  =(addy u.owner)  
+          ~&  "wrong owner"  
+          %.n
+        ?.  (~(has in challenges.state) challenge)  
+          ~&  "bad challenge"  
+          %.n
         =/  note=@uvI
           =+  octs=(as-octs:mimes:html (scot %uv challenge))
           %-  keccak-256:keccak:crypto
@@ -271,18 +289,22 @@
             (crip (a-co:co p.octs))
             q.octs
           ==
-        ?.  &(=(20 (met 3 addy)) =(65 (met 3 cock)))  %.n
+        ?.  &(=(20 (met 3 addy)) =(65 (met 3 cock)))  
+          ~&  "addy != cock"  
+          %.n
         =/  r  (cut 3 [33 32] cock)
         =/  s  (cut 3 [1 32] cock)
         =/  v=@
           =+  v=(cut 3 [0 1] cock)
-          ?+  v  !!
+          ?+  v  99
             %0   0
             %1   1
             %27  0
             %28  1
           ==
-        ?.  |(=(0 v) =(1 v))  %.n
+        ?.  |(=(0 v) =(1 v))  
+          ~&  "wrong v"
+          %.n
         =/  xy
           (ecdsa-raw-recover:secp256k1:secp:crypto note v r s)
         =/  pub  :((cury cat 3) y.xy x.xy 0x4)
@@ -322,10 +344,10 @@
   ::
   ++  enjs-challenge
     =,  enjs:format
-    |=  [=state:sur]
+    |=  chal=@
     ^-  json
     %-  pairs
-    :~  [%challenge [%s (scot %uv ?~(last-challenge.state %$ u.last-challenge.state))]]
+    :~  [%challenge [%s (scot %uv chal)]]
     ==
   ::
   ++  self-poke

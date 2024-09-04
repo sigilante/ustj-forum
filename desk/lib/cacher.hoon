@@ -150,6 +150,7 @@
       (cache-card "/imgs/favicon-16x16.png")
       (cache-card "/imgs/favicon-32x32.png")
       (cache-card "/site.webmanifest")
+      (cache-card "/forum")
   ==
 ++  cache-all
   ^-  (list card)
@@ -166,6 +167,40 @@
     =/  car  (cache-com com)
     $(coms t.coms, l [car l])
   :-  cache-root  (weld cache-static l)
+
+++  wipe  ^-  (list card)
+  ^-  (list card)
+  =|  l=(list card)
+  ::  threads
+  =/  teds  (tap:torm:sur threads)
+  =.  l  |-  ?~  teds  l
+    =/  ted=thread:sur  +.i.teds
+    =/  car  
+      =/  link  (scow:sr %uw (jam pid.ted))
+      =/  url  "/ted/{link}"
+      (uncache-card url)
+    $(teds t.teds, l [car l])
+  =/  coms  (tap:gorm:tp comments)
+  =.  l  |-  ?~  coms  l
+    =/  com=comment:tp  +.i.coms
+    =/  car  
+      =/  link  (scow:sr %uw (jam [author.com id.com]))
+      =/  url  "/com/{link}"
+      (uncache-card url)
+    $(coms t.coms, l [car l])
+  %+  weld  l
+  :~  (uncache-card "/log")
+      (uncache-card "/add")
+      :: (uncache-card "/auth")
+      :: (uncache-card "/metamask")
+      (uncache-card "/style.css")
+      (uncache-card "/imgs/favicon.ico")
+      (uncache-card "/imgs/favicon-16x16.png")
+      (uncache-card "/imgs/favicon-32x32.png")
+      (uncache-card "/site.webmanifest")
+      (uncache-card "/forum")
+      (uncache-card "")
+  ==
 ::  state updaters
 ++  save-ted
   |=  ted=thread:sur
@@ -216,11 +251,20 @@
   state
 ++  cache-card
   |=  path=tape  ^-  card
+  ~&  >>  caching=path
   =/  pathc  (crip "{base-url:cons}{path}")
   =/  router-path  ?~  path  '/'  pathc
   =/  pl=simple-payload:http  (render:rout router-path)
   =/  entry=cache-entry:eyre  [.n %payload pl]
   [%pass /root %arvo %e %set-response pathc `entry]
+++  uncache-card
+  |=  path=tape  ^-  card
+  ~&  >>  uncaching=path
+  =/  pathc  (crip "{base-url:cons}{path}")
+  =/  router-path  ?~  path  '/'  pathc
+  =/  pl=simple-payload:http  (render:rout router-path)
+  =/  entry=cache-entry:eyre  [.n %payload pl]
+  [%pass /root %arvo %e %set-response pathc ~]
 ++  handle-del
   |=  [is-ted=? =pid:tp]
   ?:  is-ted
