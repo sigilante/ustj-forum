@@ -169,6 +169,6 @@
   ++  redirect
     |=  redirect=cord
     ^-  simple-payload:http
-    [[307 ['location' redirect]~] ~]
+    [[303 ['location' redirect]~] ~]
   --
 --

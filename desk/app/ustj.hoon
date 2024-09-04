@@ -107,8 +107,8 @@
     ==
   ++  handle-ui
     |=  noun=*
-    =^  cards  state  (handle-ui:cache noun)
-    [cards this]
+      =^  cards  state  (handle-ui:cache noun)
+      [cards this]
   ::  MetaMask authentication successful.
   ::  Normally called only via self-poke from 'POST'.
   ++  handle-meta
@@ -249,8 +249,6 @@
     ^-  (quip card _this)
     =/  order  !<(order:router vase)
     =/  address  address.req.order
-    ~&  >>  processing-http-req=url.request.req.order
-    ~&  >  src.bowl
     [(eyre:rout order) this]
   --
 ++  on-peek   |=  =(pole knot)  ~

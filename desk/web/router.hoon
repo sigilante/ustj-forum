@@ -208,24 +208,24 @@
       ?:  is-ted
         =/  ted  (get-thread:lib u.pid state)
         ?~  ted  ~
-        (self-poke [%ui (~(got by sessions.state) src.bowl) eyre-id %del is-ted u.ted])
+        (self-poke [%ui src.bowl eyre-id %del is-ted u.ted])
       =/  com  (get-comment:lib u.pid state)
       ?~  com  ~
-      (self-poke [%ui (~(got by sessions.state) src.bowl) eyre-id %del is-ted u.com])
+      (self-poke [%ui src.bowl eyre-id %del is-ted u.com])
     ++  handle-vote
       |=  [is-ted=? uidt=@t vote=@t]
       =/  vot=?  .=(vote 'gud')
       =/  uid  (slaw:sr %uw uidt)  ?~  uid  ~
       =/  cued  (cue u.uid)
       =/  pid  %-  (soft pid:tp)  cued  ?~  pid  ~
-      (self-poke [%ui (~(got by sessions.state) src.bowl) eyre-id %vote is-ted u.pid vot])
+      (self-poke [%ui src.bowl eyre-id %vote is-ted u.pid vot])
     ++  handle-thread
       ?~  body  ~
       =/  bod  (frisk:rd q.u.body)
       =/  md  (~(get by bod) 'text')  ?~  md  ~
       =/  title  (~(get by bod) 'title')  ?~  title  ~
       =/  url  (~(get by bod) 'url')  ?~  url  ~
-      (self-poke [%ui (~(got by sessions.state) src.bowl) eyre-id %submit-thread u.title u.url u.md])
+      (self-poke [%ui src.bowl eyre-id %submit-thread u.title u.url u.md])
     ++  handle-reply
       |=  top=?
       ?~  body  ~
@@ -237,9 +237,9 @@
       =/  md  (~(get by bod) 'text')  ?~  md  ~
       ?:  top
         =/  ted  (get-thread:lib u.pid state)  ?~  ted  ~
-        (self-poke [%ui (~(got by sessions.state) src.bowl) eyre-id %submit-comment u.ted u.md])
+        (self-poke [%ui src.bowl eyre-id %submit-comment u.ted u.md])
       =/  com  (get-comment:lib u.pid state)  ?~  com  ~
-      (self-poke [%ui (~(got by sessions.state) src.bowl) eyre-id %submit-reply u.com u.md])
+      (self-poke [%ui src.bowl eyre-id %submit-reply u.com u.md])
     ::  MetaMask authentication request; others go via EAuth.
     ::  Modified from ~rabsef-bicrym's %mask by ~hanfel-dovned.
     ++  handle-auth

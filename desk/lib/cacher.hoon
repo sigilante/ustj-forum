@@ -250,17 +250,20 @@
   =.  karma  (~(put by karma) who new)
   state
 ++  cache-card
-  |=  path=tape  ^-  card
-  ~&  >>  caching=path
-  =/  pathc  (crip "{base-url:cons}{path}")
-  =/  router-path  ?~  path  '/'  pathc
-  =/  pl=simple-payload:http  (render:rout router-path)
-  =/  entry=cache-entry:eyre  [.n %payload pl]
-  [%pass /root %arvo %e %set-response pathc `entry]
+::  provisional until we figure out a permanent fix
+  uncache-card
+:: ++  cache-card
+::   |=  path=tape  ^-  card
+::   =/  pathc  (crip "{base-url:cons}{path}")
+::   ~&  >>  caching=pathc
+::   =/  router-path  ?~  path  '/'  pathc
+::   =/  pl=simple-payload:http  (render:rout router-path)
+::   =/  entry=cache-entry:eyre  [.n %payload pl]
+::   [%pass /root %arvo %e %set-response pathc `entry]
 ++  uncache-card
   |=  path=tape  ^-  card
-  ~&  >>  uncaching=path
   =/  pathc  (crip "{base-url:cons}{path}")
+  ~&  >>  uncaching=pathc
   =/  router-path  ?~  path  '/'  pathc
   =/  pl=simple-payload:http  (render:rout router-path)
   =/  entry=cache-entry:eyre  [.n %payload pl]
