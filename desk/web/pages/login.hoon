@@ -112,38 +112,4 @@
   });
 '''
 --
-          ~&  "no owner"  
-          %.n
-        ?.  =(addy u.owner)  
-        =/  owner  (get-owner who)  ?~  owner  
-          ~&  "wrong owner"  
-          %.n
-        ?.  (~(has in challenges.state) challenge)  
-          ~&  "bad challenge"  
-          %.n
-        =/  note=@uvI
-          =+  octs=(as-octs:mimes:html (scot %uv challenge))
-          %-  keccak-256:keccak:crypto
-          %-  as-octs:mimes:html
-          ;:  (cury cat 3)
-            '\19Ethereum Signed Message:\0a'
-            (crip (a-co:co p.octs))
-            q.octs
-          ==
-        ?.  &(=(20 (met 3 addy)) =(65 (met 3 cock)))  
-          ~&  "addy != cock"  
-          %.n
-        =/  r  (cut 3 [33 32] cock)
-        =/  s  (cut 3 [1 32] cock)
-        =/  v=@
-          =+  v=(cut 3 [0 1] cock)
-          ?+  v  99
-            %0   0
-            %1   1
-            %27  0
-            %28  1
-          ==
-        ?.  |(=(0 v) =(1 v))  
-          ~&  "wrong v"
-          %.n
-        =/  xy
+
