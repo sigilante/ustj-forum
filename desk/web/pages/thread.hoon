@@ -70,12 +70,7 @@
     ;div#thread-body
       ;*  body
     ==
-    ;div#comment-composer
-      ;div#comment-prompt.cp:"add a comment"
-      ;div#composer-proper(hidden "")
-        ;+  (reply-composer:comps pids .y)
-      ==
-    ==
+    ;+  (comment-composer:comps src.bowl pids)
     ;+  comments
     ;script:"{reply-script}"
   ==

@@ -4,7 +4,7 @@
 |_  [=state:sur =bowl:gall]
 ++  login
   ^-  manx
-  ?-  (clan:title (~(gut by sessions.state) src.bowl (dec (bex 128))))
+  ?-  (clan:title src.bowl)
     %czar  sigil
     %king  sigil
     %duke  sigil
@@ -24,14 +24,15 @@
   ;+  ;a/"/forum/add":"new post"
 ++  sigil
   :: ;+  (sig(size 48) src.bowl)
-  =/  =ship
-    ?+  (clan:title (~(gut by sessions.state) src.bowl (dec (bex 128))))
-        !!
-      %czar  ?:((gte (bex 64) src.bowl) src.bowl (~(got by sessions.state) src.bowl))
-      %king  ?:((gte (bex 64) src.bowl) src.bowl (~(got by sessions.state) src.bowl))
-      %duke  ?:((gte (bex 64) src.bowl) src.bowl (~(got by sessions.state) src.bowl))
-      %earl  ?:((gte (bex 64) src.bowl) src.bowl (~(got by sessions.state) src.bowl))
-    ==
+  :: =/  =ship
+  ::   ?+  (clan:title (~(gut by sessions.state) src.bowl (dec (bex 128))))
+  ::       !!
+  ::     %czar  ?:((gte (bex 64) src.bowl) src.bowl (~(got by sessions.state) src.bowl))
+  ::     %king  ?:((gte (bex 64) src.bowl) src.bowl (~(got by sessions.state) src.bowl))
+  ::     %duke  ?:((gte (bex 64) src.bowl) src.bowl (~(got by sessions.state) src.bowl))
+  ::     %earl  ?:((gte (bex 64) src.bowl) src.bowl (~(got by sessions.state) src.bowl))
+  ::   ==
+  =/  ship  src.bowl
   =/  p  (scow %p ship)
     ;div.f.g2
       ;*  new-post-link
@@ -59,9 +60,11 @@
   %-  trip
 '''
   async function setSigil(){
+    console.log("setting sigil")
     const div = document.getElementById("login-div");
     const res = await fetch("/forum/f/sigil");
     const t = await res.text();
+    console.log("sigil", t);
     if (t) div.innerHTML = t;
   }  
   setSigil();

@@ -1,6 +1,17 @@
 /-  sur=forum, tp=post
 /+  lib=forum, sr=sortug
 |%
+
+
+++  comment-composer  |=  [who=@p pids=tape]  ^-  manx
+  ?:  ?=(%pawn (clan:title who))  ;span;
+    ;div#comment-composer
+      ;div#comment-prompt.cp:"add a comment"
+      ;div#composer-proper(hidden "")
+        ;+  (reply-composer pids .y)
+      ==
+    ==
+
 ++  votes  |=  v=votes:tp
   =/  old  (old:si tally.v)
   =/  arrow  ?:  -.old

@@ -40,6 +40,7 @@
 ++  on-leave  |~(* [~ this])
 ++  on-poke
   |=  [=mark =vase]
+  =.  bowl  (meta-login:lib bowl sessions)
   |^
   ?+  mark  [~ this]
     %handle-http-request  serve
@@ -54,12 +55,17 @@
     ?:  ?=(%seed a)   teds:seed
     ?:  ?=(%seed2 a)  coms:seed
     ?:  ?=(%seed3 a)  reps:seed
+    ?:  ?=(%sessions a)        handle-sess
+    ?:  ?=(%chal a)            handle-chal
     ::  admin
     ?:  ?=([%hr @p ?] a)      (handle-hr +.a)
     ?:  ?=([%ban @p ?] a)     (handle-ban +.a)
     ?:  ?=([%del-ted @t] a)   (handle-del .y +.a)
     ?:  ?=([%del-com @t] a)   (handle-del .n +.a)
+    ::  metamask
+    ?:  ?=([%meta @t] a)        (handle-meta +.a)
     ?:  ?=([%auth @p @p @uv] a)  (handle-auth +.a)
+    
     ~&  >>>  wtf=a
     [~ this]
   ++  handle-del
@@ -90,12 +96,14 @@
   ++  handle-cache
     |=  a=*
     :_  this
-    =/  which  ($?(%root %ted %sta %all) a)
+    =/  which  ($?(%root %ted %sta %all %wipe) a)
+    ~&  >  cache-which=which
     ?-  which
       %root  :~(cache-root:cache)
       %sta   cache-static:cache
       %ted   cache-threads:cache
       %all   cache-all:cache
+      %wipe  wipe:cache
     ==
   ++  handle-ui
     |=  noun=*
@@ -103,6 +111,16 @@
     [cards this]
   ::  MetaMask authentication successful.
   ::  Normally called only via self-poke from 'POST'.
+  ++  handle-meta
+    |=  new-challenge=@
+    =?    sessions
+        !(~(has by sessions) src.bowl)
+      (~(put by sessions) [src.bowl src.bowl])
+    =.  last-challenge  `new-challenge
+    =?    challenges
+        =(src.bowl (~(got by sessions) src.bowl))
+      (~(put in challenges) new-challenge)
+  `this
   ++  handle-auth
     |=  [who=@p src=@p =secret]
     ^-  [(list card) _this]
@@ -113,6 +131,14 @@
       challenges      (~(del in challenges) secret)
       last-challenge  ?:(=(last-challenge `secret) ~ last-challenge)
     ==
+  ++  handle-sess
+  ~&  >>  sessions
+  `this
+  ++  handle-chal
+  ~&  >>  challenges
+  ~&  "wiping challenges"
+  =.  challenges  *(set secret)
+  `this
   ++  test
     =/  teds  (tap:torm threads)
     =/  coms  (tap:gorm:tp comments)
@@ -223,20 +249,8 @@
     ^-  (quip card _this)
     =/  order  !<(order:router vase)
     =/  address  address.req.order
-    ::  Provision MetaMask sessions.
-    ?:  ?&  =(%'GET' method.request.req.order)
-            =(%'/metamask' url.request.req.order)
-        ==
-      =?    sessions
-          !(~(has by sessions) src.bowl)
-        (~(put by sessions) [src.bowl src.bowl])
-      =/  new-challenge  (sham [now eny]:bowl)
-      =.  last-challenge  `new-challenge
-      =?    challenges
-          =(src.bowl (~(got by sessions) src.bowl))
-        (~(put in challenges) new-challenge)
-      [(eyre:rout order) this]
-    ::  Normal request.
+    ~&  >>  processing-http-req=url.request.req.order
+    ~&  >  src.bowl
     [(eyre:rout order) this]
   --
 ++  on-peek   |=  =(pole knot)  ~
@@ -265,17 +279,17 @@
 ++  root-path-card
   ^-  card
   [%pass /root %arvo %e %connect [~ /forum] dap.bowl]
-++  metamask-card
-  ^-  card
-  [%pass /root %arvo %e %connect [~ /metamask] dap.bowl]
-++  auth-card
-  ^-  card
-  [%pass /root %arvo %e %connect [~ /auth] dap.bowl]
+:: ++  metamask-card
+::   ^-  card
+::   [%pass /root %arvo %e %connect [~ /metamask] dap.bowl]
+:: ++  auth-card
+::   ^-  card
+::   [%pass /root %arvo %e %connect [~ /auth] dap.bowl]
 ++  init-cards
   ^-  (list card)
   :~  root-path-card
-      metamask-card
-      auth-card
+      :: metamask-card
+      :: auth-card
       schedule-challenge-clear-card
   ==
 ++  schedule-backup-card
