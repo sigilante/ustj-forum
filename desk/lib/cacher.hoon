@@ -67,10 +67,16 @@
     ?~  uted  `state
     =/  ted  u.uted
     =/  v  votes.ted
-    =/  nv  %=  v
-      tally  (sum:si tally.v votesi)
-      leger  (~(put by leger.v) src.bowl vote)
-    ==
+    =/  nv
+      %=  v
+        tally   ~&  >>  [tally.v votesi leger.v]
+                ?:  (~(has by leger.v) src.bowl)
+                  ?:  =((~(got by leger.v) src.bowl) votesi)
+                    tally.v
+                  (sum:si tally.v (pro:si --2 votesi))
+                (sum:si tally.v votesi)
+        leger   (~(put by leger.v) src.bowl vote)
+      ==
     =.  ted  ted(votes nv)
     =.  state  (save-ted ted)
     =.  state  (save-karma ship.pid.ted vote)
@@ -87,10 +93,26 @@
     ?~  ucom  `state
     =/  com  u.ucom
     =/  v  votes.com
-    =/  nv  %=  v
-      tally  (sum:si tally.v votesi)
-      leger  (~(put by leger.v) src.bowl vote)
-    ==
+    =/  nv
+      ::  have they voted before?
+      ?:  (~(has by leger.v) src.bowl)
+        ::  is their vote the same?
+        ?:  =((~(got by leger.v) src.bowl) vote)
+          ::  yes to both so cancel the vote
+          %=  v
+            tally  (dif:si tally.v votesi)
+            leger  (~(del by leger.v) src.bowl)
+          ==
+        ::  yes/no so reverse the vote
+        %=  v
+          tally  (sum:si tally.v (pro:si --2 votesi))
+          leger  (~(put by leger.v) src.bowl vote)
+        ==
+      ::  no so add the vote
+      %=  v
+        tally   (sum:si tally.v votesi)
+        leger   (~(put by leger.v) src.bowl vote)
+      ==
     =.  com  com(votes nv)
     =.  comments  (put:gorm:tp comments pid com)
     =.  state  (save-karma author.com vote)
