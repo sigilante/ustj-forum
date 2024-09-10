@@ -68,13 +68,27 @@
     =/  ted  u.uted
     =/  v  votes.ted
     =/  nv
+      ::  have they voted before?
+      ?:  (~(has by leger.v) src.bowl)
+        ~&  >  'already voted'
+        ::  is their vote the same?
+        ?:  =((~(got by leger.v) src.bowl) vote)
+          ~&  >  'canceling vote'
+          ::  yes to both so cancel the vote
+          %=  v
+            tally  (dif:si tally.v votesi)
+            leger  (~(del by leger.v) src.bowl)
+          ==
+        ~&  >  'reversing vote'
+        ::  yes/no so reverse the vote
+        %=  v
+          tally  (sum:si tally.v (pro:si --2 votesi))
+          leger  (~(put by leger.v) src.bowl vote)
+        ==
+      ~&  >  'new vote'
+      ::  no so add the vote
       %=  v
-        tally   ~&  >>  [tally.v votesi leger.v]
-                ?:  (~(has by leger.v) src.bowl)
-                  ?:  =((~(got by leger.v) src.bowl) votesi)
-                    tally.v
-                  (sum:si tally.v (pro:si --2 votesi))
-                (sum:si tally.v votesi)
+        tally   (sum:si tally.v votesi)
         leger   (~(put by leger.v) src.bowl vote)
       ==
     =.  ted  ted(votes nv)
