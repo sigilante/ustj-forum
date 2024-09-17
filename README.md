@@ -13,22 +13,3 @@ Created by ~polwex for the [Urbit Foundation](https://urbit.org).
 
 > :ustj [%ui ~magbel *@ta %auth ~magbel *@uv "0xae530A3D4bcD3B236F4227A4ADe2f462B802FA25" "0xae530A3D4bcD3B236F4227A4ADe2f462B802FA25"]
 ```
-
-##  Login
-
-1. Urbit OS login is managed by Eyre's EAuth system.
-2. Urbit ID login is provisioned for MetaMask.  Two endpoints are exposed:
-  1. `/metamask` to obtain the session secret (via `POST`).
-  2. `/auth` to `POST` the authentication attempt.
-
----
-
-## TODOs ahead of launch
-
-- [~] fix CSS/layout to perfectly match main site
-- [x] fix HTTPS on host ship
-- [~] redirect from MetaMask login to main forum page when logged in
-- [ ] fix 404 on top parent of comment (should return to thread)
-- [x] add “Hosted on Urbit” to footer (`/web/layout.hoon`)
-- [x] implement CLI generators for pokes
-- [x] link from main site
